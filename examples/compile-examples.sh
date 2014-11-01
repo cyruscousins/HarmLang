@@ -1,18 +1,18 @@
 #!/usr/bin/sh
-ghc ../src/initialbasis/HarmLang-initialbasis.hs  \
-    ../src/syntax/HarmLang-syntax.hs  \
-    ../src/parser/HarmLang-parser.hs  \
-    ../src/interpreter/HarmLang-interpreter.hs  \
+ghc ../src/HarmLang/Types.hs  \
+    ../src/HarmLang/Parser.hs  \
+    ../src/HarmLang/Interpreter.hs  \
+    ../src/HarmLang/InitialBasis.hs  \
     cycle.hs
 
-ghc ../src/initialbasis/HarmLang-initialbasis.hs  \
-    ../src/syntax/HarmLang-syntax.hs  \
-    ../src/parser/HarmLang-parser.hs  \
-    ../src/interpreter/HarmLang-interpreter.hs  \
+ghc ../src/HarmLang/Types.hs  \
+    ../src/HarmLang/Parser.hs  \
+    ../src/HarmLang/Interpreter.hs  \
+    ../src/HarmLang/InitialBasis.hs  \
     transpose.hs
 
-ghc ../src/initialbasis/HarmLang-initialbasis.hs  \
-    ../src/syntax/HarmLang-syntax.hs  \
-    ../src/parser/HarmLang-parser.hs  \
-    ../src/interpreter/HarmLang-interpreter.hs  \
+ghc ../src/HarmLang/Types.hs  \
+    ../src/HarmLang/Parser.hs  \
+    ../src/HarmLang/Interpreter.hs  \
+    ../src/HarmLang/InitialBasis.hs  \
     melody.hs

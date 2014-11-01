@@ -20,7 +20,7 @@ maintainer:          louis.rassaby@tufts.edu
 
 category:            Language
 build-type:          Simple
-extra-source-files:  README.md, examples/*
+extra-source-files:  README.md, examples/*.sh, examples/*.hs, grammar/*.pdf, grammar/*.tex
 
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >=1.10
@@ -28,7 +28,7 @@ cabal-version:       >=1.10
 
 library
   -- Modules exported by the library.
-  -- exposed-modules:     
+  exposed-modules:   HarmLang.Interpreter, HarmLang.Parser, HarmLang.Types, HarmLang.InitialBasis
   
   -- Modules included in this library but not exported.
   -- other-modules:       
@@ -37,10 +37,13 @@ library
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.7 && <4.8
+  build-depends:       base >=4.7 && <4.8,
+                       template-haskell,
+                       HUnit,
+                       parsec >= 3.1.0
   
   -- Directories containing source files.
-  hs-source-dirs:      src/initialbasis/*, src/parser/*, src/syntax/*, src/interpreter/*
+  hs-source-dirs:      src/
   
   -- Base language which the package is written in.
   default-language:    Haskell2010
