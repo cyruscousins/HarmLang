@@ -1,0 +1,165 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{syntax}
+
+
+\usepackage{verbatim}
+\usepackage{multicol}
+\usepackage{color}
+\usepackage[margin=.8in]{geometry}
+\usepackage{enumerate}
+\usepackage{indentfirst}
+\usepackage{amssymb}
+
+\definecolor{hlcol}{RGB}{75,50,40}
+\definecolor{question}{RGB}{50,50,60}
+
+\title{HarmLang Grammar}
+\author{Cyrus Cousins and Louis Rassaby}
+\date{October 29 2014}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+%\pagebreak
+
+\section{Introduction}
+
+\subsection{A Note on Syntax}
+
+In our grammar, we attempted to conform to the ISO 14977 standard for the Extended Backus-Naur Form syntactic metalanguage.  Salient differences from the PADS grammar documentation include:
+
+\begin{itemize}
+\item = is used in place of ::=.
+\item Syntactic elements are explicitly terminated with a semicolon ;
+\item Rather than terminal ? and * for option and repeat, items are enclosed in [square brackets] and \{flower brackets\}, respectively.
+\item Literal strings are \texttt{"quoted"}.
+\end{itemize}
+
+\section{Grammar}
+\subsection{Text Primitives}
+
+%See "http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form" for an explanation on EBNF.  The standard detailed there is different from that used by KF, but she cleared the use of the standard.
+
+\begin{grammar}
+
+<whitespacechar> = "\" \"" | "\"\\t\"" ;
+
+<whitespace> = <whitespacechar>, \{<whitespacechar>\} ;
+
+
+%<digitnzero> = "\"1\"" | "\"2\"" | "\"3\"" | "\"4\"" | "\"5\"" | "\"6\"" | "\"7\"" | "\"8\"" | "\"9\"" ;
+
+%<digit> = "\"0\"" | <digitnzero> ;
+
+<digit> = "\"0\"" | "\"1\"" | "\"2\"" | "\"3\"" | "\"4\"" | "\"5\"" | "\"6\"" | "\"7\"" | "\"8\"" | "\"9\"" ;
+
+%<lower> = "\"a\"" | "\"b\"" | "\"c\"" | "\"d\"" | "\"e\"" | "\"f\"" | "\"g\"" | "\"h\"" | "\"i\"" | "\"j\"" | "\"k\"" | "\"l\"" | "\"m\"" | "\"n\"" | "\"o\"" | "\"p\"" | "\"q\"" | "\"r\"" | "\"s\"" | "\"t\"" | "\"u\"" | "\"v\"" | "\"w\"" | "\"x\"" | "\"y\"" | "\"z\"" ;
+
+%<upper> = "\"A\"" | "\"B\"" | "\"C\"" | "\"D\"" | "\"E\"" | "\"F\"" | "\"G\"" | "\"H\"" | "\"I\"" | "\"J\"" | "\"K\"" | "\"L\"" | "\"M\"" | "\"N\"" | "\"O\"" | "\"P\"" | "\"Q\"" | "\"R\"" | "\"S\"" | "\"T\"" | "\"U\"" | "\"V\"" | "\"W\"" | "\"X\"" | "\"Y\"" | "\"Z\"" ;
+
+%<alphabetic> = <lower> | <upper> ;
+
+%<alphanumeric> = <alphabetic> | <digit> ;
+\end{grammar}
+
+\subsection{Types}
+
+The following are types that have special syntax for literal values in HarmLang, and are thus in some sense primitives.  Of the following, perhaps the most important syntactic elements are the <chordprogression> and <timedchordprogression>.  Most of the others build up to this element.
+
+\begin{grammar}
+
+<int> = ("\"-\""), <digit>, \{<digit>\} ;
+
+<uint> = <digit>, \{<digit>\} ;
+
+%<string> = "``", {<alphanumeric>}, "''" ;
+
+%<pint> = <digitnzero>, \{<digit>\} %Probably not a good thing to do in the grammar.
+
+%<simpletype> = <int> | <string> ;
+
+%<musicaltype> = <interval> | <pitchclass> | <pitch> | <note> | <chord> | <timedchord> ;
+
+%<type> = <simpletype> | <musicaltype> | <tuple> | <list> ;
+
+%<tuple> = "\"(\"", [<whitespace>], [<type> \{[<whitespace>], "\",\"", [<whitespace>], <type>\}], "\")\"" ;
+
+%<list> = "\"[\"", [<whitespace>], [<type>, [<whitespace>], \{"\",\"", [<whitespace>], <type> \}], [<whitespace>] "\"]\"" ;
+
+\end{grammar}
+
+\subsection{Musical Primitives}
+\begin{grammar}
+<noteletter> = "\"A\"" | "\"B\"" | "\"C\"" |  "\"D\"" | "\"E\"" | "\"F\"" |  "\"G\"" ;
+
+<modulator> = "\"#\"" | "\"b\"" ; %One may think of these modulators as the successor and predecessor functions for Z12.
+
+<pitchclass> = <noteletter>, \{<modulator>\} ;
+%TODO: Sexy grammatical alternative:
+%<pitchclass> = <noteletter> | <pitchclass>, <modulator> ; (* Ooh recursion! *)
+
+<pitch> = <pitchclass>, <int> ;
+
+<timeunit> = <int>, "\"/\"", <uint> | <uint> ;
+
+%<note> = (<pitch> | <rest>) | <timeunit> ; %Rest was out of scope for the assignment.
+<note> = <pitch> <timeunit> ;
+
+<numinterval> = <int> ;
+
+<namedinterval> = "\"0th\"" | "\"U\"" | "\"unison\"" | "\"m2nd\"" | "\"-2nd\"" | "\"minorsecond\"" | "\"2nd\"" | "\"second\"" | "\"m3rd\"" | "\"-3rd\"" | "\"minorthird\"" | "\"3rd\"" | "\"third\"" | "\"4th\"" | "\"fourth\"" | "\"+4th\"" | "\"#4th\"" | "\"augmentedfourth\"" | "\"-5th\"" | "\"d5th\"" | "\"o5th\"" | "\"b5th\"" | "\"diminishedfifth\"" | "\"tritone\"" | "\"5th\"" | "\"fifth\"" | "\"+5th\"" | "\"augmentedfifth\"" | "\"m6th\"" | "\"-6th\"" | "\"minorsixth\"" | "\"6th\"" | "\"sixth\"" | "7th"0
+"\"d7th\"" | "\"dom7th\"" | "\"b7th\"" | "\"seventh\"" | "\"minorseventh\"" | "\"dominantseventh\"" | "\"ma7th\"" | "\"majorseventh\"" | "\"octave\"" ;
+
+
+%<diatonicintervalname> = "\"2nd\"" | "\"3rd\"" | "\"4th\"" |  "\"5th\"" | "\"6th\"" | "\"7th\"" ;
+
+%<namedinterval> = ["\"m\"" | "\"M\"" | "\"+\"" |  "\"dim\""], <diatonicintervalname> ;
+
+
+<interval> = <numinterval> | <namedinterval> ;
+
+<rest> = "\"_\"" | "\"REST\"" | "\"SILENCE\"" ;
+
+<begin> = "\"BEGIN\"" | "\"START\"" ;
+
+<end> = "\"END\"" ;
+
+<specialharmony> = <rest> | <begin> | <end> ; %TODO
+
+%Currently, can't just say C to reference a C major chord.  Add this?
+<namedchord> = "\"5\"" | "\"M\"" | "\"m\"" | "\"b5\"" | "\"dim\"" | "\"o\"" | "\"7\"" | "\"Ma7\"" | "\"m7\"" | "\"mMa7\"" | "\"m7b5\"" | "\"dim7\"" | "\"o7\"" | "\"9\"" | "\"b9\"" | "\"#9\"" | "\"Ma9\"" | "\"m11\"" | "\"7b6\"" | "\"13\"" | "\"Ma13\"" ;
+
+<chord> = <pitchclass>, "\":i \"", \{<interval>\} \\
+        | <pitchclass>, "\":n \"", \{<pitchclass>\} \\
+        | <pitchclass>, <namedchord> \\
+        | <specialharmony> ;
+
+<timedchord> = <chord>, "\":\"", <timeunit> ;
+
+<chordprogression> = \{<chord>, <whitespace>\} ;
+
+<timedchordprogression> = \{<timedchord>, <whitespace>\} ;
+
+\end{grammar}
+\section{Notes}
+\begin{enumerate}
+\item To express a pitch class, one would write something of the form ``A'', ``C\#'', ``Bbb''. Perverse forms, such as ``C\#\#\#\#'' or ``Gb\#'' are also allowed.
+\item One could write a C major chord in the following ways.
+\begin{enumerate}
+\item ``\texttt{C:i 4,7}''
+\item ``\texttt{C:i 3rd,5th}''
+\item ``\texttt{C:n E,G}''
+\item ``\texttt{CM}''
+\end{enumerate}
+
+%\item One may think of pitch classes as elements of $\mathbb{Z}_{12}$, in which one may think of ``\texttt{\#}'' and ``\texttt{b}'' as the successor and predecessor functions, respectively.  The letters ``\texttt{A}'' through ``\texttt{G}'' can be thought of literal values in the space.  Note that not all literal values can be directly expressed, however due to the cyclic nature of the group all elements of $\mathbb{Z}_{12}$ can be described with a successor or predecessor and even a single literal.  If this seems backwards, the discordancy between text based music notation and traditional (excluding solfege) music notation is to blame.
+
+
+\item One may think of pitch classes as elements of $\mathbb{Z}_{12}$, in which ``\texttt{\#}'' and ``\texttt{b}'' act as the successor and predecessor functions, respectively. The letters ``\texttt{A}'' through ``\texttt{G}'' can be thought of literal values in the space. Not all values in $\mathbb{Z}_{12}$ can be directly expressed as literals without the use of the successor or predecessor functions. However, any element of the set can be described by appending a successor or predecessor to a single letter.
+\end{enumerate}
+\end{document}
+
