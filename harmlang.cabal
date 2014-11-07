@@ -31,7 +31,7 @@ library
   exposed-modules:   HarmLang.Interpreter, HarmLang.Parser, HarmLang.Types, HarmLang.InitialBasis
   
   -- Modules included in this library but not exported.
-  -- other-modules:       
+  other-modules:     HarmLang.Utility
   
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:    

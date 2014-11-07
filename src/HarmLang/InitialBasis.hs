@@ -1,8 +1,9 @@
 module HarmLang.InitialBasis where
 
-import HarmLang.Types
-
 import Data.Char
+
+import HarmLang.Types
+import HarmLang.Utility
 
 -- TEXT FUNCTIONS:
 -- Used by the parser, but may be useful elsewhere.
@@ -108,7 +109,7 @@ inverse :: Interval -> Interval
 inverse (Interval a) = Interval (12 - a)
 
 toChord :: PitchClass -> [PitchClass] -> Chord
-toChord root rest = Harmony root $ (map (intervalAB $ root) rest )
+toChord root rest = Harmony root $ sortedUnique (map (intervalAB $ root) rest)
 --TODO: This absolutely won't work without nub and sort!!!
 
 -- TYPECLASSES
