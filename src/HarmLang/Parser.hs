@@ -155,12 +155,12 @@ parseChordNamed =
     return $ Harmony root $ chordNameToIntervalSet name
 
 strToChordSpecial :: String -> Chord
-strToChordSpecial "_" = Rest
-strToChordSpecial "REST" = Rest
-strToChordSpecial "SILENCE" = Rest
-strToChordSpecial "BEGIN" = Begin
-strToChordSpecial "START" = Begin
-strToChordSpecial "END" = End
+strToChordSpecial "_" = Other "Rest"
+strToChordSpecial "REST" = Other "Rest"
+strToChordSpecial "SILENCE" = Other "Rest"
+strToChordSpecial "BEGIN" = Other "Begin"
+strToChordSpecial "START" = Other "Begin"
+strToChordSpecial "END" = Other "End"
 strToChordSpecial _ = error "Invalid special chord."
 
 -- Parse a rest (Just '_')
@@ -169,6 +169,14 @@ parseChordFromOtherNotation =
   do --TODO: Surely there is a function to do this
     str <- (string "_") <|> (string "REST") <|> (string "SILENCE") <|> (string "START") <|> (string "END")
     return $ strToChordSpecial str
+
+parseQuotedOther :: GenParser Char st Chord
+parseQuotedOther =
+  do
+    char '"'
+    text <- parseAlphaNumericString
+    char '"'
+    return $ Other text
 
 parseChord :: GenParser Char st Chord
 parseChord = (try parseChordFromOtherNotation) <|> (try parseChordFromNotes) <|> (try parseChordFromIntervals) <|> (parseChordNamed) --TODO I would rather have a greedy match so the tags aren't necessary.
