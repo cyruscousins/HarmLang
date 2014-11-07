@@ -76,7 +76,7 @@ data Note = Note Pitch Time deriving (Show, Eq) --TODO At some point we want to 
 
 -- Chord datatype is represented as a root and a list of intervals from the root or a special case.
 -- The intervals are expected to be ordered and without repetition.
-data Chord = Harmony PitchClass [Interval] | Rest | Begin | End deriving (Show, Eq)
+data Chord = Harmony PitchClass [Interval] | Other String deriving (Show, Eq)
 
 data TimedChord = TimedChord Chord Time deriving (Show, Eq)
 
