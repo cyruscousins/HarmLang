@@ -15,6 +15,11 @@ import Text.ParserCombinators.Parsec
 import HarmLang.Types
 import HarmLang.InitialBasis
 
+openSingle = "'"
+closeSingle = openSingle
+openProgression = "["
+closeProgression = "]"
+
 --PARSER COMPONENTS:
 
 --Basic whitespace parser
@@ -134,8 +139,7 @@ parseChordFromNotes :: GenParser Char st Chord
 parseChordFromNotes =
   do
     root <- parsePitchClass
-    tag <- string ":n "
-    rest <- sepBy parsePitchClass (char ',') <|> (return [])
+    rest <- parseProgression parsePitchClass -- <|> (return [])
     return $ toChord root rest
 
 -- From intervals (Of the form "A,4,7" or "A,3rd,5th")
@@ -143,8 +147,7 @@ parseChordFromIntervals :: GenParser Char st Chord
 parseChordFromIntervals =
   do
     root <- parsePitchClass
-    tag <- string ":i "
-    intervals <- sepBy parseInterval (string ",")
+    intervals <- parseProgression parseInterval
     return $ Harmony root intervals
 
 parseChordNamed :: GenParser Char st Chord
@@ -189,31 +192,60 @@ parseTimedChord =
     time <- parseTime
     return $ TimedChord chord time
 
-
+parseProgression :: GenParser Char st a -> GenParser Char st [a] 
+parseProgression parser =
+  do 
+    string openProgression
+    progression <- sepBy parser parseWhiteSpace
+    string closeProgression
+    return progression 
 
 -- PITCH PROGRESSION PARSER
 parsePitchProgression :: GenParser Char st [Pitch]
-parsePitchProgression = sepBy parsePitch parseWhiteSpace
+parsePitchProgression = parseProgression parsePitch
 
 -- CHORD PROGRESSION PARSER
 parseChordProgression :: GenParser Char st [Chord]
-parseChordProgression = sepBy parseChord parseWhiteSpace
+parseChordProgression = parseProgression parseChord
 
 -- TIMED CHORD PROGRESSION PARSER
 parseTimedChordProgression :: GenParser Char st [TimedChord]
-parseTimedChordProgression = sepBy parseTimedChord parseWhiteSpace
+parseTimedChordProgression = parseProgression parseTimedChord
 
 -- NOTE PROGRESSION PARSER
 parseNoteProgression :: GenParser Char st [Note]
-parseNoteProgression = sepBy parseNote parseWhiteSpace
+parseNoteProgression = parseProgression parseNote
 
 
---To Test:
-{-
-parse chordProgression "(unknown)" "A,C,E B,C,C#"
-parse parseBasicPitchClass "(unknown)" "A"
-parse parsePitchClass "(unknown)" "A#"
+parseSingle :: GenParser Char st a -> GenParser Char st a
+parseSingle parser = 
+  do 
+    string openSingle
+    single <- parser
+    string closeSingle
+    return single 
 
+-- PITCH CLASS PARSER
+parsePitchClassSingle :: GenParser Char st PitchClass
+parsePitchClassSingle = parseSingle parsePitchClass
 
+-- INTERVAL PARSER
+parseIntervalSingle :: GenParser Char st Interval
+parseIntervalSingle = parseSingle parseInterval
 
--}
+-- PITCH PROGRESSION PARSER
+parsePitchSingle :: GenParser Char st Pitch
+parsePitchSingle = parseSingle parsePitch
+
+-- CHORD PROGRESSION PARSER
+parseChordSingle :: GenParser Char st Chord
+parseChordSingle = parseSingle parseChord
+
+-- TIMED CHORD PROGRESSION PARSER
+parseTimedChordSingle :: GenParser Char st TimedChord
+parseTimedChordSingle = parseSingle parseTimedChord
+
+-- NOTE PROGRESSION PARSER
+parseNoteSingle :: GenParser Char st Note
+parseNoteSingle = parseSingle parseNote
+
