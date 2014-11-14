@@ -1,9 +1,11 @@
+{-# LANGUAGE DeriveDataTypeable #-}
+
 module HarmLang.Expression
 where
 
 import HarmLang.Types
--- import Data.Typeable
--- import Data.Data
+import Data.Typeable
+import Data.Data
 
 
 data HLExp = ExpPitchClass PitchClass 
@@ -16,5 +18,5 @@ data HLExp = ExpPitchClass PitchClass
            | ExpChordProgression [Chord]
            | ExpTimedChordProgression [TimedChord]
            | ExpNoteProgression [Note]
-    deriving(Show)
+    deriving(Show, Typeable, Data, Eq)
 

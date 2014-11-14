@@ -76,7 +76,10 @@ parsePitchClass =
     
 --Parse a numeric interval (it's just a uint).
 parseNumericInterval :: GenParser Char st Interval
-parseNumericInterval = (>>=) parseInteger (return . Interval)
+parseNumericInterval = 
+  do 
+    a <- parseInteger
+    return $ Interval a
 
 --Parse a named interval, using an initial basis function.
 parseNamedInterval :: GenParser Char st Interval
@@ -85,7 +88,8 @@ parseNamedInterval =
     alphanum <- parseAlphaNumericString
     return $ interpretNamedIntervalCaseInsensitive alphanum
 
-parseInterval = (try parseNamedInterval) <|> (try parseNumericInterval)
+parseInterval :: GenParser Char st Interval
+parseInterval = (try parseNamedInterval) <|> parseNumericInterval
 
 -- Pitch parser
 

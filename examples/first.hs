@@ -1,17 +1,24 @@
+{-# LANGUAGE  QuasiQuotes #-}
+
 module Examples.First where
 
 import HarmLang.Interpreter
 import HarmLang.Types
 import HarmLang.InitialBasis
+import HarmLang.QuasiQuoter
+import HarmLang.Expression
+
 import Test.HUnit hiding (test)
 
 
 test = runTestTT tests
-tests = TestList [ TestLabel "Note test" testNote,
-                   TestLabel "TimedChord test" testTimedChord,
-                   TestLabel "TimedChord Progression test" testTimedChordProgression,
-                   TestLabel "Chord test" testChord,
-                   TestLabel "Transpose Chord test" testTransposeChord]
+tests = TestList [ 
+                   -- TestLabel "Note test" testNote,
+                   -- TestLabel "TimedChord test" testTimedChord,
+                   -- TestLabel "TimedChord Progression test" testTimedChordProgression,
+                   -- TestLabel "Chord test" testChord,
+                   -- TestLabel "Transpose Chord test" testTransposeChord,
+                   TestLabel "Basic quasi quoting" testQuasiQuoting]
 
 -- parse tests
 testNote = let
@@ -45,5 +52,9 @@ testTransposeChord = let
     in 
     TestCase $ assertEqual "Chord test" should got 
 
--- many initial basis functions as nonfunctional as of yet, but the focus of
--- this submission is the parser. initial basis will be completed later.
+-- transposeChord
+testQuasiQuoting = let
+    got = [hl|'A'|] 
+    should = ExpPitchClass(PitchClass 0)
+    in 
+    TestCase $ assertEqual "Quasi quoting test" should got 
