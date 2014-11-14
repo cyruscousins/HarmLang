@@ -35,6 +35,9 @@ parseWhiteSpace =
 parseAlphaNumericString :: GenParser Char st String
 parseAlphaNumericString = many1 $ oneOf (['0'..'9'] ++ ['a'..'z'] ++ ['A'..'Z'])
 
+parseSpacedAlphaNumericString :: GenParser Char st String
+parseSpacedAlphaNumericString = many1 $ oneOf(['0'..'9'] ++ ['a'..'z'] ++ ['A'..'Z'] ++ [' '])
+
 --Integer Parser
 
 --Parse an unsigned integer.
@@ -85,7 +88,7 @@ parseNamedInterval =
     alphanum <- parseAlphaNumericString
     return $ interpretNamedIntervalCaseInsensitive alphanum
 
-parseInterval = (try parseNamedInterval) <|> (try parseNumericInterval)
+parseInterval = (try parseNamedInterval) <|> parseNumericInterval
 
 -- Pitch parser
 
@@ -233,19 +236,19 @@ parsePitchClassSingle = parseSingle parsePitchClass
 parseIntervalSingle :: GenParser Char st Interval
 parseIntervalSingle = parseSingle parseInterval
 
--- PITCH PROGRESSION PARSER
+-- PITCH PARSER
 parsePitchSingle :: GenParser Char st Pitch
 parsePitchSingle = parseSingle parsePitch
 
--- CHORD PROGRESSION PARSER
+-- CHORD PARSER
 parseChordSingle :: GenParser Char st Chord
 parseChordSingle = parseSingle parseChord
 
--- TIMED CHORD PROGRESSION PARSER
+-- TIMED CHORD PARSER
 parseTimedChordSingle :: GenParser Char st TimedChord
 parseTimedChordSingle = parseSingle parseTimedChord
 
--- NOTE PROGRESSION PARSER
+-- NOTE PARSER
 parseNoteSingle :: GenParser Char st Note
 parseNoteSingle = parseSingle parseNote
 
