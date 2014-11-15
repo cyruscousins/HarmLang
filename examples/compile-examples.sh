@@ -1,4 +1,3 @@
-#!/usr/bin/sh
 ghc ../src/HarmLang/Types.hs  \
     ../src/HarmLang/Parser.hs  \
     ../src/HarmLang/Interpreter.hs  \
