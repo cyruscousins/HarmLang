@@ -31,6 +31,34 @@ hlParse =
     -- also, add parseIntervalProgression
     -- and pitch class progressions
     error "Invalid HarmLang expression."
+    
+--This function takes an HLExp and converts it to an ExpQ by unpacking the inner HL type.
+hlExpToExpQ :: HLExp -> ExpQ
+hlExpToExpQ ExpPitchClass a -> dataToExpQ a
+hlExpToExpQ ExpInterval a -> dataToExpQ a
+hlExpToExpQ ExpPitch a -> dataToExpQ a
+hlExpToExpQ ExpTimedChord a -> dataToExpQ a
+hlExpToExpQ ExpNote a -> dataToExpQ a
+hlExpToExpQ ExpChord a -> dataToExpQ a
+hlExpToExpQ ExpPitchProgression a -> dataToExpQ a
+hlExpToExpQ ExpChordProgression a -> dataToExpQ a
+hlExpToExpQ ExpTimedChordProgression a -> dataToExpQ a
+hlExpToExpQ ExpNoteProgression a -> dataToExpQ a
+
+
+data HLExp = ExpPitchClass PitchClass 
+           | ExpInterval Interval
+           | ExpPitch Pitch
+           | ExpTimedChord TimedChord
+           | ExpNote Note
+           | ExpChord Chord
+           | ExpPitchProgression [Pitch]
+           | ExpChordProgression [Chord]
+           | ExpTimedChordProgression [TimedChord]
+           | ExpNoteProgression [Note]
+    deriving(Show, Typeable, Data, Eq)
+
+
 
 
 hl :: QuasiQuoter
@@ -62,11 +90,12 @@ quoteHLExp s =  do
                       let pos =  (TH.loc_filename loc,
                                  fst (TH.loc_start loc),
                                  snd (TH.loc_start loc))
-                      hlExp <- hlParseMonad pos s
-                      dataToExpQ (const Nothing `extQ` bullshit) hlExp
+                      hlExp <- 
+                      hlParseMonad pos s
+                      hlExpToExpQ hlExp --dataToExpQ (const Nothing `extQ` defnothing) hlExp
  
-bullshit :: HLExp -> Maybe (TH.Q TH.Exp)
-bullshit _ = Nothing
+defnothing :: HLExp -> Maybe (TH.Q TH.Exp)
+defnothing _ = Nothing
 
 -- antiHLExp :: Expr -> Maybe (TH.Q TH.Exp)
 -- antiHLExp  (AntiIntExpr v)  = Just $ TH.appE  (TH.conE (TH.mkName "IntExpr"))
