@@ -68,7 +68,7 @@ In our grammar, we attempted to conform to the ISO 14977 standard for the Extend
 
 \subsection{Types}
 
-The following are types that have special syntax for literal values in HarmLang, and are thus in some sense primitives.  Of the following, perhaps the most important syntactic elements are the <chordprogression> and <timedchordprogression>.  Most of the others build up to this element.
+The following are types that have special syntax for literal values in HarmLang, and are thus in some sense primitives.  Of the following, perhaps the most important syntactic elements are the <progression> and <singleton>.  Most of the others build up to these elements.
 
 \begin{grammar}
 
@@ -119,8 +119,9 @@ The following are types that have special syntax for literal values in HarmLang,
 
 %<namedinterval> = ["\"m\"" | "\"M\"" | "\"+\"" |  "\"dim\""], <diatonicintervalname> ;
 
-
-<interval> = <numinterval> | <namedinterval> ;
+%TODO named intervals are temporarily out of order.  I have no idea why.
+%<interval> = <numinterval> | <namedinterval> ;
+<interval> = <numinterval> ;
 
 <rest> = "\"_\"" | "\"REST\"" | "\"SILENCE\"" ;
 
@@ -133,16 +134,21 @@ The following are types that have special syntax for literal values in HarmLang,
 %Currently, can't just say C to reference a C major chord.  Add this?
 <namedchord> = "\"5\"" | "\"M\"" | "\"m\"" | "\"b5\"" | "\"dim\"" | "\"o\"" | "\"7\"" | "\"Ma7\"" | "\"m7\"" | "\"mMa7\"" | "\"m7b5\"" | "\"dim7\"" | "\"o7\"" | "\"9\"" | "\"b9\"" | "\"#9\"" | "\"Ma9\"" | "\"m11\"" | "\"7b6\"" | "\"13\"" | "\"Ma13\"" ;
 
-<chord> = <pitchclass>, "\":i \"", \{<interval>\} \\
-        | <pitchclass>, "\":n \"", \{<pitchclass>\} \\
+<chord> = <pitchclass>, "\"[\"", \{<interval>, "\" \""\}, "\"]\"" \\
+        | <pitchclass>, "\"[\"", \{<pitchclass>, "\" \""\}, "\"]\"" \\
         | <pitchclass>, <namedchord> \\
         | <specialharmony> ;
 
 <timedchord> = <chord>, "\":\"", <timeunit> ;
 
-<chordprogression> = \{<chord>, <whitespace>\} ;
+<parsabletype> = <interval> |<pitchclass> | <pitch> | <note> | <chord> | <timedchord> ;
 
-<timedchordprogression> = \{<timedchord>, <whitespace>\} ;
+<singleton> = "\"'\"", <parseabletype>, "\"'\"" ;
+<progression> = "\"[\"", <parseabletype>, "\"'\"" ;
+
+%<chordprogression> = \{<chord>, <whitespace>\} ;
+
+%<timedchordprogression> = \{<timedchord>, <whitespace>\} ;
 
 \end{grammar}
 \section{Notes}
@@ -150,9 +156,9 @@ The following are types that have special syntax for literal values in HarmLang,
 \item To express a pitch class, one would write something of the form ``A'', ``C\#'', ``Bbb''. Perverse forms, such as ``C\#\#\#\#'' or ``Gb\#'' are also allowed.
 \item One could write a C major chord in the following ways.
 \begin{enumerate}
-\item ``\texttt{C:i 4,7}''
-\item ``\texttt{C:i 3rd,5th}''
-\item ``\texttt{C:n E,G}''
+\item ``\texttt{C[4 7]}''
+%\item ``\texttt{C:i 3rd,5th}''
+\item ``\texttt{C[E G]}''
 \item ``\texttt{CM}''
 \end{enumerate}
 

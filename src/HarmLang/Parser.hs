@@ -92,7 +92,7 @@ parseNamedInterval =
     return $ interpretNamedIntervalCaseInsensitive alphanum
 
 parseInterval :: GenParser Char st Interval
-parseInterval = (try parseNamedInterval) <|> parseNumericInterval
+parseInterval = (try parseNumericInterval) <|> (parseNamedInterval)
 
 -- Pitch parser
 
@@ -190,7 +190,7 @@ parseQuotedOther =
     return $ Other text
 
 parseChord :: GenParser Char st Chord
-parseChord = (try parseChordFromOtherNotation) <|> (try parseChordFromNotes) <|> (try parseChordFromIntervals) <|> (parseChordNamed) --TODO I would rather have a greedy match so the tags aren't necessary.
+parseChord = (try parseChordFromOtherNotation) <|> (try parseChordFromNotes) <|> (try parseChordFromIntervals) <|> (parseChordNamed)
 
 parseTimedChord :: GenParser Char st TimedChord
 parseTimedChord =

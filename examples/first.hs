@@ -22,21 +22,21 @@ tests = TestList [
                    TestLabel "Quasi quoting: Pitch Class" testQuasiQuotingPitchClass,
                    TestLabel "Quasi quoting: Pitch" testQuasiQuotingPitch,
                    TestLabel "Quasi quoting: Timed Chord" testQuasiQuotingTimedChord,
-                   TestLabel "Quasi quoting: Note" testQuasiQuotingNote]
-                   --TestLabel "Quasi quoting: Chord" testQuasiQuotingChord,
-                   --TestLabel "Quasi quoting: Note Progression" testQuasiQuotingNoteProgression,
-                   --TestLabel "Quasi quoting: Timed Chord Progression" testQuasiQuotingTimedChordProgression,
-                   --TestLabel "Quasi quoting: Interval" testQuasiQuotingInterval
+                   TestLabel "Quasi quoting: Note" testQuasiQuotingNote,
+                   TestLabel "Quasi quoting: Chord" testQuasiQuotingChord,
+                   TestLabel "Quasi quoting: Note Progression" testQuasiQuotingNoteProgression,
+                   TestLabel "Quasi quoting: Timed Chord Progression" testQuasiQuotingTimedChordProgression,
+                   TestLabel "Quasi quoting: Interval" testQuasiQuotingInterval]
 
 -- parse tests
 testNote = let
-    got = interpretNote "A5:4"
+    got = interpretNote "A 5:4"
     should = Note (Pitch (PitchClass 0) 5) (Time 4 4)
     in 
     TestCase $ assertEqual "Note test" should got 
 
 testChord = let
-    got = interpretChord "C#:n G#,B"
+    got = interpretChord "C#[G# B]"
     should = Harmony (PitchClass 4) [Interval 7,Interval 10]
     in 
     TestCase $ assertEqual "Chord test" should got 
@@ -48,14 +48,14 @@ testTimedChord = let
     TestCase $ assertEqual "TimedChord test" should got 
 
 testTimedChordProgression = let
-    got = interpretTimedChordProgression "FMa7:4 F#o7:4/2"
+    got = interpretTimedChordProgression "[FMa7:4 F#o7:4/2]"
     should = [TimedChord (Harmony (PitchClass 8) [Interval 4,Interval 7,Interval 11]) (Time 4 4),TimedChord (Harmony (PitchClass 9) [Interval 3,Interval 6,Interval 9]) (Time 4 2)]
     in 
     TestCase $ assertEqual "TimedChord Progression test" should got 
 
 -- transposeChord
 testTransposeChord = let
-    got = transpose (interpretChord "C#:n G#,B") (Interval 7) 
+    got = transpose (interpretChord "C#[G# B]") (Interval 7) 
     should = Harmony (PitchClass 11) [Interval 7,Interval 10]
     in 
     TestCase $ assertEqual "Chord test" should got 
@@ -89,11 +89,39 @@ testQuasiQuotingNote = let
     in 
     TestCase $ assertEqual "Quasi quoting TimedChord test" should got 
 
+-- Quasiquoting on chords
+testQuasiQuotingChord = let
+    got = [[hl|'AM'|], [hl|'C#m7b5'|]] 
+    should = [Harmony (PitchClass 0) [(Interval 4), (Interval 7)], Harmony (PitchClass 4) [(Interval 3), (Interval 6), (Interval 10)]]
+    in 
+    TestCase $ assertEqual "Quasi quoting Chord test" should got 
+
+-- 
+testQuasiQuotingNoteProgression = let
+    got = [hl|[B 5:3 D 6:3/2]|] 
+    should = [Note (Pitch (PitchClass 2) 5) (Time 3 4), Note (Pitch (PitchClass 5) 6) (Time 3 2)]
+    in 
+    TestCase $ assertEqual "Quasi quoting NoteProgression test" should got 
+
+--
+testQuasiQuotingTimedChordProgression = let
+    got = [hl|[FMa7:4 F#o7:4/2]|]
+    should = [TimedChord (Harmony (PitchClass 8) [Interval 4,Interval 7,Interval 11]) (Time 4 4),TimedChord (Harmony (PitchClass 9) [Interval 3,Interval 6,Interval 9]) (Time 4 2)]
+    in 
+    TestCase $ assertEqual "Quasi quoting TimedChord Progression test" should got 
+
+-- Quasiquoting on intervals
+testQuasiQuotingInterval = let
+    got = [[hl|'4'|], [hl|'8'|]]
+    should = [Interval 4, Interval 8]
+    in 
+    TestCase $ assertEqual "Quasi quoting Interval test" should got 
+
+
+
 --TODO:
 --Do these:
 {-
-                   TestLabel "Quasi quoting: Chord" testQuasiQuotingChord,
-                   TestLabel "Quasi quoting: Note Progression" testQuasiQuotingNoteProgression,
                    TestLabel "Quasi quoting: Timed Chord Progression" testQuasiQuotingTimedChordProgression,
                    TestLabel "Quasi quoting: Interval" testQuasiQuotingInterval]
 -}
