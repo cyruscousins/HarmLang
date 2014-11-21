@@ -31,35 +31,34 @@ hlParse =
     -- also, add parseIntervalProgression
     -- and pitch class progressions
     error "Invalid HarmLang expression."
-    
---This function takes an HLExp and converts it to an ExpQ by unpacking the inner HL type.
-hlExpToExpQ :: HLExp -> ExpQ
-hlExpToExpQ ExpPitchClass a -> dataToExpQ a
-hlExpToExpQ ExpInterval a -> dataToExpQ a
-hlExpToExpQ ExpPitch a -> dataToExpQ a
-hlExpToExpQ ExpTimedChord a -> dataToExpQ a
-hlExpToExpQ ExpNote a -> dataToExpQ a
-hlExpToExpQ ExpChord a -> dataToExpQ a
-hlExpToExpQ ExpPitchProgression a -> dataToExpQ a
-hlExpToExpQ ExpChordProgression a -> dataToExpQ a
-hlExpToExpQ ExpTimedChordProgression a -> dataToExpQ a
-hlExpToExpQ ExpNoteProgression a -> dataToExpQ a
+
+------------------
+--The following takes an HLExp and converts it to an ExpQ by unpacking the inner HL type.
+
+hlExpToExpQ :: HLExp -> TH.ExpQ
+hlExpToExpQ (ExpPitchClass a) = makeHlExpQ a
+hlExpToExpQ (ExpInterval a) = makeHlExpQ a
+hlExpToExpQ (ExpPitch a) = makeHlExpQ a
+hlExpToExpQ (ExpTimedChord a) = makeHlExpQ a
+hlExpToExpQ (ExpNote a) = makeHlExpQ a
+hlExpToExpQ (ExpChord a) = makeHlExpQ a
+hlExpToExpQ (ExpPitchProgression a) = makeHlExpQ a
+hlExpToExpQ (ExpChordProgression a) = makeHlExpQ a
+hlExpToExpQ (ExpTimedChordProgression a) = makeHlExpQ a
+hlExpToExpQ (ExpNoteProgression a) = makeHlExpQ a
 
 
-data HLExp = ExpPitchClass PitchClass 
-           | ExpInterval Interval
-           | ExpPitch Pitch
-           | ExpTimedChord TimedChord
-           | ExpNote Note
-           | ExpChord Chord
-           | ExpPitchProgression [Pitch]
-           | ExpChordProgression [Chord]
-           | ExpTimedChordProgression [TimedChord]
-           | ExpNoteProgression [Note]
-    deriving(Show, Typeable, Data, Eq)
+--Type driven hacks
+--nothingness :: HLExp -> Maybe (TH.Q TH.Exp)
+--nothingness _ = Nothing
 
+--enothing :: HLExp -> Maybe (TH.Q TH.Exp)
+--enothing = (const Nothing `extQ` nothingness)
 
+makeHlExpQ :: Data a => a -> TH.ExpQ
+makeHlExpQ = dataToExpQ (\ a -> Nothing)
 
+-----------OK the bad stuff is over.
 
 hl :: QuasiQuoter
 hl =  QuasiQuoter { quoteExp = quoteHLExp,
@@ -90,12 +89,8 @@ quoteHLExp s =  do
                       let pos =  (TH.loc_filename loc,
                                  fst (TH.loc_start loc),
                                  snd (TH.loc_start loc))
-                      hlExp <- 
-                      hlParseMonad pos s
+                      hlExp <- hlParseMonad pos s
                       hlExpToExpQ hlExp --dataToExpQ (const Nothing `extQ` defnothing) hlExp
- 
-defnothing :: HLExp -> Maybe (TH.Q TH.Exp)
-defnothing _ = Nothing
 
 -- antiHLExp :: Expr -> Maybe (TH.Q TH.Exp)
 -- antiHLExp  (AntiIntExpr v)  = Just $ TH.appE  (TH.conE (TH.mkName "IntExpr"))
