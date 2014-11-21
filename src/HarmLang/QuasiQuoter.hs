@@ -47,22 +47,31 @@ hlExpToExpQ (ExpChordProgression a) = makeHlExpQ a
 hlExpToExpQ (ExpTimedChordProgression a) = makeHlExpQ a
 hlExpToExpQ (ExpNoteProgression a) = makeHlExpQ a
 
+--HLExp to PatQ
+hlExpToPatQ :: HLExp -> TH.PatQ
+hlExpToPatQ (ExpPitchClass a) = makeHlPatQ a
+hlExpToPatQ (ExpInterval a) = makeHlPatQ a
+hlExpToPatQ (ExpPitch a) = makeHlPatQ a
+hlExpToPatQ (ExpTimedChord a) = makeHlPatQ a
+hlExpToPatQ (ExpNote a) = makeHlPatQ a
+hlExpToPatQ (ExpChord a) = makeHlPatQ a
+hlExpToPatQ (ExpPitchProgression a) = makeHlPatQ a
+hlExpToPatQ (ExpChordProgression a) = makeHlPatQ a
+hlExpToPatQ (ExpTimedChordProgression a) = makeHlPatQ a
+hlExpToPatQ (ExpNoteProgression a) = makeHlPatQ a
 
 --Type driven hacks
---nothingness :: HLExp -> Maybe (TH.Q TH.Exp)
---nothingness _ = Nothing
-
---enothing :: HLExp -> Maybe (TH.Q TH.Exp)
---enothing = (const Nothing `extQ` nothingness)
-
 makeHlExpQ :: Data a => a -> TH.ExpQ
 makeHlExpQ = dataToExpQ (\ a -> Nothing)
+
+makeHlPatQ :: Data a => a -> TH.PatQ
+makeHlPatQ = dataToPatQ (\ a -> Nothing)
 
 -----------OK the bad stuff is over.
 
 hl :: QuasiQuoter
 hl =  QuasiQuoter { quoteExp = quoteHLExp,
-                    quotePat = error "Not implemented" }
+                    quotePat = quoteHLPat }
 
 
 hlParseMonad :: Monad m => (String, Int, Int) -> String -> m HLExp
@@ -92,29 +101,14 @@ quoteHLExp s =  do
                       hlExp <- hlParseMonad pos s
                       hlExpToExpQ hlExp --dataToExpQ (const Nothing `extQ` defnothing) hlExp
 
--- antiHLExp :: Expr -> Maybe (TH.Q TH.Exp)
--- antiHLExp  (AntiIntExpr v)  = Just $ TH.appE  (TH.conE (TH.mkName "IntExpr"))
---                                                 (TH.varE (TH.mkName v))
--- antiHLExp  (AntiExpr v)     = Just $ TH.varE  (TH.mkName v)
--- antiHLExp  _                = Nothing
- 
-
--- quoteHLPat :: String -> TH.PatQ
--- quoteHLPat s = do   
---                       loc <- TH.location
---                       let pos =  (TH.loc_filename loc,
---                                  fst (TH.loc_start loc),
---                                  snd (TH.loc_start loc))
---                       hlExp <- hlParse pos s
---                       dataToPatQ (const Nothing `extQ` (\ _ -> Nothing)) hlExp
- 
--- antiHLPat :: Expr -> Maybe (TH.Q TH.Pat)
--- antiHLPat  (AntiIntExpr v)  = Just $ TH.conP  (TH.mkName "IntExpr")
---                                                 [TH.varP (TH.mkName v)]
--- antiHLPat  (AntiExpr v)     = Just $ TH.varP  (TH.mkName v)
--- antiHLPat  _                = Nothing
-
-
+quoteHLPat :: String -> TH.PatQ
+quoteHLPat s = do   
+                       loc <- TH.location
+                       let pos =  (TH.loc_filename loc,
+                                 fst (TH.loc_start loc),
+                                 snd (TH.loc_start loc))
+                       hlExp <- hlParseMonad pos s
+                       hlExpToPatQ hlExp
 
 -- Just for testing
 hlInterpret :: String -> HLExp

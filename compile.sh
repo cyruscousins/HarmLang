@@ -5,5 +5,7 @@
 
 SOURCE=src/HarmLang/*.hs
 ghc $SOURCE examples/transpose.hs
+
+exit
 ghc $SOURCE examples/cycle.hs
 ghc $SOURCE examples/first.hs
