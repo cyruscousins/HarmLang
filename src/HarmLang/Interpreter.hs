@@ -12,10 +12,17 @@ import Text.ParserCombinators.Parsec
 
 --Each function is essentially the same: just boring boilerplate allowing the use of the parser at runtime.
 
+interpretPitchClass :: String -> PitchClass
+interpretPitchClass = 
+  let checkResult (Right res) = res
+      checkResult _ = error "Invalid PitchClass."
+  in 
+    checkResult . (parse parsePitchClass "")
+
 interpretPitch :: String -> Pitch
 interpretPitch = 
   let checkResult (Right harmony) = harmony
-      checkResult _ = error "Invalid Chord."
+      checkResult _ = error "Invalid Pitch."
   in 
     checkResult . (parse parsePitch "")
 
@@ -35,7 +42,7 @@ interpretTimedChord =
 
 interpretNote :: String -> Note
 interpretNote = 
-  let checkResult (Right harmony) = harmony
+  let checkResult (Right res) = res
       checkResult _ = error "Invalid Note."
   in 
     checkResult . (parse parseNote "")
