@@ -100,7 +100,7 @@ parsePitch :: GenParser Char st Pitch
 parsePitch =
   do
     pc <- parsePitchClass
-    char ' '
+    char '@'
     octave <- parseUInteger
     return $ Pitch pc octave
 

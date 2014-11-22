@@ -102,7 +102,7 @@ The following are types that have special syntax for literal values in HarmLang,
 %TODO: Sexy grammatical alternative:
 %<pitchclass> = <noteletter> | <pitchclass>, <modulator> ; (* Ooh recursion! *)
 
-<pitch> = <pitchclass>, <int> ;
+<pitch> = <pitchclass>, "\"@\"", <int> ;
 
 <timeunit> = <int>, "\"/\"", <uint> | <uint> ;
 

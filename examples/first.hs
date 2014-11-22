@@ -18,7 +18,6 @@ tests = TestList [
                    TestLabel "TimedChord Progression test" testTimedChordProgression,
                    TestLabel "Chord test" testChord,
                    TestLabel "Transpose Chord test" testTransposeChord,
-
                    TestLabel "Quasi quoting: Pitch Class" testQuasiQuotingPitchClass,
                    TestLabel "Quasi quoting: Pitch" testQuasiQuotingPitch,
                    TestLabel "Quasi quoting: Timed Chord" testQuasiQuotingTimedChord,
@@ -30,7 +29,7 @@ tests = TestList [
 
 -- parse tests
 testNote = let
-    got = interpretNote "A 5:4"
+    got = interpretNote "A@5:4"
     should = Note (Pitch (PitchClass 0) 5) (Time 4 4)
     in 
     TestCase $ assertEqual "Note test" should got 
@@ -70,7 +69,7 @@ testQuasiQuotingPitchClass = let
 
 -- Quasiquoting on pitches
 testQuasiQuotingPitch = let
-    got = [[hl|'A 5'|], [hl|'C# 6'|]] 
+    got = [[hl|'A@5'|], [hl|'C#@6'|]] 
     should = [Pitch (PitchClass 0) 5 , Pitch (PitchClass 4) 6]
     in 
     TestCase $ assertEqual "Quasi quoting Pitch test" should got 
@@ -84,7 +83,7 @@ testQuasiQuotingTimedChord = let
 
 -- Quasiquoting on notes
 testQuasiQuotingNote = let
-    got = [[hl|'B 5:3'|], [hl|'D 6:3/2'|]] 
+    got = [[hl|'B@5:3'|], [hl|'D@6:3/2'|]] 
     should = [Note (Pitch (PitchClass 2) 5) (Time 3 4), Note (Pitch (PitchClass 5) 6) (Time 3 2)]
     in 
     TestCase $ assertEqual "Quasi quoting TimedChord test" should got 
@@ -98,7 +97,7 @@ testQuasiQuotingChord = let
 
 -- 
 testQuasiQuotingNoteProgression = let
-    got = [hl|[B 5:3 D 6:3/2]|] 
+    got = [hl|[B@5:3 D@6:3/2]|] 
     should = [Note (Pitch (PitchClass 2) 5) (Time 3 4), Note (Pitch (PitchClass 5) 6) (Time 3 2)]
     in 
     TestCase $ assertEqual "Quasi quoting NoteProgression test" should got 

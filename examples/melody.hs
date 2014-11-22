@@ -1,9 +1,11 @@
+{-# LANGUAGE  QuasiQuotes #-}
+
 import HarmLang.Interpreter
 import HarmLang.Types
 import HarmLang.InitialBasis
+import HarmLang.QuasiQuoter
 
-
-twinkle = interpretNoteProgression "D4:1 D4:1 A5:1 A5:1 B5:1 B5:1 A5:2 G4:1 G4:1 F#4:1 F#4:1 E4:1 E4:1 D4:2"
+twinkle = [hl|[D@4:1 D@4:1 A@5:1 A@5:1 B@5:1 B@5:1 A@5:2 G@4:1 G@4:1 F#@4:1 F#@4:1 E@4:1 E@4:1 D@4:2]|] 
 
 main :: IO ()
 main = 

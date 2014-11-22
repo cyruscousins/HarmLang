@@ -20,7 +20,7 @@ maintainer:          louis.rassaby@tufts.edu
 
 category:            Language
 build-type:          Simple
-extra-source-files:  README.md, examples/*.sh, examples/*.hs, grammar/*.pdf, grammar/*.tex
+extra-source-files:  README.md, examples/Makefile, examples/*.hs, grammar/*.pdf, grammar/*.tex
 
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >=1.10
