@@ -23,7 +23,8 @@ data HarmonyDistributionModel = HarmonyDistributionModel Integer (Map ChordProgr
 
 type HarmonyDistributionModel HDM
 
-buildHarmonyDistributionModel :: [ChordProgression] Integer -> HarmonyDistributionModel
+buildHarmonyDistributionModel :: [ChordProgression] -> Integer -> HarmonyDistributionModel
+buildHarmonyDistributionModel cpArr k = 
 
 hdmChoose :: Double -> HDM -> HDM -> HDM
 hdmChoose = error "No hdm choose."

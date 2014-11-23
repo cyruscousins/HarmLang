@@ -10,6 +10,7 @@ import Data.Map
 
 type (Dist Chord) ChordDistribution
 
+type Double Probability
 
 
 
@@ -26,18 +27,19 @@ sliceKmers i h:hs = if length h:hs < i then [] else (take i h:hs) : (sliceKmers 
 k :: Int
 k = 3
 
-data HarmonyDistributionModel = HarmonyDistributionModel Integer (Map ChordProgression Chord) --Double (ChordProgression -> Double) (Map ChordProgression Chord)
+data HarmonyDistributionModel = HarmonyDistributionModel Integer (Data.Map ChordProgression ChordDistribution) --Double (ChordProgression -> Double) (Map ChordProgression Chord)
 --type HarmDistModel HarmonyDistributionModel
 
 type HarmonyDistributionModel HDM
 
 buildHarmonyDistributionModel :: [ChordProgression] -> Integer -> HarmonyDistributionModel
 buildHarmonyDistributionModel cpArr k =
-  let pairKmerWithNext = 
-      list = foldr (++) [] (map cpArr (\ cp -> (map (sliceKmers (k + 1)) (kmer -> (take k kmer, last kmer) )))) --TODO this is slow.
-      mapAll = ...
-      mapAllSorted = ...
-      mapAllDist =
+  let listVals = foldr (++) [] (map (\ cp -> (map (\ kmer -> (take k kmer, last kmer) (sliceKmers (k + 1))  ))) cpArr) --TODO this is slow.
+      listValLists = map (\ (key, val) -> (key, [val])) listVals
+      mapAll = Data.Map.fromListWith (++) listValLists
+      --mapAllSorted = map List.sort mapAll
+      mapAllDist = map equally mapAll
+  in mapAllDist
     
 
 hdmChoose :: Double -> HDM -> HDM -> HDM
@@ -70,3 +72,22 @@ extend hdm cp = cp ++ [nextHarm hdm cp]
 generate :: HDM -> ChordProgression -> Integer -> ChordProgression
 generate _ cp 0 = cp
 generate hdm cp lenToGen = generate hdm (extend cp) (lenToGen - 1)
+
+
+
+
+
+
+
+
+
+--Calculates P(progression | HarmonyDistributionModel), or probability of generating a progression from a generative model.
+probProgGivenModel :: HarmonyDistributionModel -> [Harmony] -> Probability
+probProgGivenModel hdm@(HarmonyDistributionModel k [[Harmony]]) prog = product (map (sliceKmers k prog) (\ kmer -> probv (hDist hdm (take (k-1) kmer)) (last kmer) ) )
+
+--(getK hdm)
+
+inferStyle :: [HarmonyDistributionModel] -> [Harmony] -> [Probability]
+--Fixed point style.
+--inferStyle models prog = map models ((flip probProgGivenModel) prog)
+inferStyle models prog = map models (\ model -> probProgGivenModel model prog)
