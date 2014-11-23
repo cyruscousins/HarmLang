@@ -1,0 +1,7 @@
+\contentsline {section}{\numberline {1}Introduction}{1}
+\contentsline {subsection}{\numberline {1.1}A Note on Syntax}{1}
+\contentsline {section}{\numberline {2}Grammar}{1}
+\contentsline {subsection}{\numberline {2.1}Text Primitives}{1}
+\contentsline {subsection}{\numberline {2.2}Types}{1}
+\contentsline {subsection}{\numberline {2.3}Musical Primitives}{2}
+\contentsline {section}{\numberline {3}Notes}{2}
