@@ -4,13 +4,15 @@ where
 
 import HarmLang.Types
 
-import Data.Map
+import HarmLang.Probability
+
+import qualified Data.Map 
 
 --DIST:
 
-type (Dist Chord) ChordDistribution
+type ChordDistribution = (Dist Chord)
 
-type Double Probability
+type Probability = Double
 
 
 
@@ -22,23 +24,23 @@ type Double Probability
 
 
 sliceKmers :: Int -> ChordProgression -> [ChordProgression]
-sliceKmers i h:hs = if length h:hs < i then [] else (take i h:hs) : (sliceKmers i hs)
+sliceKmers i (h:hs) = if length h:hs < i then [] else (take i h:hs) : (sliceKmers i hs)
 
 k :: Int
 k = 3
 
-data HarmonyDistributionModel = HarmonyDistributionModel Integer (Data.Map ChordProgression ChordDistribution) --Double (ChordProgression -> Double) (Map ChordProgression Chord)
+data HarmonyDistributionModel = HarmonyDistributionModel Integer (Data.Map.Map ChordProgression ChordDistribution) --Double (ChordProgression -> Double) (Map ChordProgression Chord)
 --type HarmDistModel HarmonyDistributionModel
 
-type HarmonyDistributionModel HDM
+type HDM = HarmonyDistributionModel
 
 buildHarmonyDistributionModel :: [ChordProgression] -> Integer -> HarmonyDistributionModel
-buildHarmonyDistributionModel cpArr k =
-  let listVals = foldr (++) [] (map (\ cp -> (map (\ kmer -> (take k kmer, last kmer) (sliceKmers (k + 1))  ))) cpArr) --TODO this is slow.
+buildHarmonyDistributionModel cpArr kVal =
+  let listVals = foldr (++) [] (map (\ cp -> (map (\ kmer -> (take kVal kmer, last kmer) (sliceKmers (kVal + 1))  ))) cpArr) --TODO this is slow.
       listValLists = map (\ (key, val) -> (key, [val])) listVals
       mapAll = Data.Map.fromListWith (++) listValLists
       --mapAllSorted = map List.sort mapAll
-      mapAllDist = map equally mapAll
+      mapAllDist = Data.Map.map equally mapAll
   in mapAllDist
     
 
@@ -47,12 +49,12 @@ hdmChoose = error "No hdm choose."
 
 --TODO Switch to pattern matching
 hdmAskK :: HDM -> Integer
-hdmAskK (k _) = k
+hdmAskK kVal _ = kVal
 
 -- chord progression must be of length k
 distAfter :: HDM -> ChordProgression -> Dist Chord
-distAfter hdm cp = if length cp /= k then error "bad cp length" else
-  case (findKey cp hdm) of
+distAfter (_ hdmMap) cp = if length cp /= k then error "bad cp length" else
+  case (Data.Map.(!) cp hdmMap) of
     Nothing -> error "did not find case." --TODO even distribution?
     Just d -> d
                    
