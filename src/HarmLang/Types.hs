@@ -60,7 +60,12 @@ data Note = Note Pitch Time deriving (Show, Eq, Data, Typeable) --TODO At some p
 -- The intervals are expected to be ordered and without repetition.
 data Chord = Harmony PitchClass [Interval] | Other String deriving (Show, Eq, Data, Typeable)
 
+
 data TimedChord = TimedChord Chord Time deriving (Show, Eq, Data, Typeable)
 
 
 --TODO: Intervals, Times, and Harmonies have a logical normative representation, as well as other representations that aren't so logical.  Need to limit functionality so as to keep them in the normal forms.
+
+type ChordProgression = [Chord]
+type TimedChordProgression = [TimedChord]
+

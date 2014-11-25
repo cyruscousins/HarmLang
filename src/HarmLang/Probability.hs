@@ -11,9 +11,11 @@ import Data.Function
 -- pmap
 -- resolve
 -- joint (needn't)
--- vprob
+-- probv
 -- pgroup
 -- pcombine
+-- maxlikelihood
+-- sample
 
 -------------
 --- TYPES ---
@@ -87,9 +89,9 @@ bindx dist f = resolve $ pmap f dist
 --- OBSERVERS ---
 -----------------
 
-vprob :: (Eq a) => Dist a -> a -> Double
-vprob (Dist []) val = 0
-vprob (Dist xs) val =
+probv :: (Eq a) => Dist a -> a -> Double
+probv (Dist []) val = 0
+probv (Dist xs) val =
     let vp ((v, p):xs) v' =
             if v == v'
             then p
@@ -98,7 +100,8 @@ vprob (Dist xs) val =
 
 -- prob of seeing a value that matches the predicate
 prob :: Eq a => (a -> Bool) -> Dist a -> Double
-prob f as = vprob (pmap f as) True
+prob f as = probv (pmap f as) True
+--TODO this is a slow way to implement this function.
 
 support :: Dist a -> [a]
 support (Dist as) = fst (unzip as)
@@ -138,6 +141,15 @@ pcombine eq (Dist as) =
 
 pfilter :: (Eq a) => (a -> Bool) -> Dist a -> Dist a
 pfilter f (Dist as) = weightedly $ filter (\(a, _) -> f a) as
+
+maxlikelihood :: (Eq a) => Dist a -> a
+maxlikelihood (Dist distList) = let (item, _) = maximumBy (\ (_, prob1) (_, prob2) -> (compare) prob1 prob2) distList in item
+
+--TODO
+
+--sample ::
+
+--TODO Use randomness monad?
 
 ----------------------
 --- MISC FUNCTIONS ---
