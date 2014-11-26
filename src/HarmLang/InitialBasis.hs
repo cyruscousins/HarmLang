@@ -84,6 +84,7 @@ chordNameToIntervalSet name =
     nToInts "o" = [3,6]
     nToInts "7" = [4,7,10]
     nToInts "Ma7" = [4,7,11] --TODO delta 7
+    nToInts "M7" = [4,7,11]
     nToInts "m7" = [3,7,10]
     nToInts "mMa7" = [3,7,11]
     nToInts "m7b5" = [3,6,10]

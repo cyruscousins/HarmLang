@@ -8,6 +8,9 @@ import HarmLang.InitialBasis
 import HarmLang.QuasiQuoter
 import HarmLang.Expression
 
+import HarmLang.Probability
+import HarmLang.HarmonyDistributionModel
+
 import Test.HUnit hiding (test)
 
 
@@ -25,7 +28,9 @@ tests = TestList [
                    TestLabel "Quasi quoting: Chord" testQuasiQuotingChord,
                    TestLabel "Quasi quoting: Note Progression" testQuasiQuotingNoteProgression,
                    TestLabel "Quasi quoting: Timed Chord Progression" testQuasiQuotingTimedChordProgression,
-                   TestLabel "Quasi quoting: Interval" testQuasiQuotingInterval]
+                   TestLabel "Quasi quoting: Interval" testQuasiQuotingInterval,
+
+                   TestLabel "ModelTests" testHarmonyDistributionModel]
 
 -- parse tests
 testNote = let
@@ -118,11 +123,12 @@ testQuasiQuotingInterval = let
 
 
 
---TODO:
---Do these:
-{-
-                   TestLabel "Quasi quoting: Timed Chord Progression" testQuasiQuotingTimedChordProgression,
-                   TestLabel "Quasi quoting: Interval" testQuasiQuotingInterval]
--}
+testHarmonyDistributionModel = let
+    k = 2
+    hdm = buildHarmonyDistributionModel k [[hl|[Dm GM CM Dm GM CM]|], [hl|[Dm GM FM]|], [hl|[Dm GM E7]|]]
+    got = [probv (distAfter hdm [hl|[Dm GM]|]) [hl|'CM'|], probv (distAfter hdm [hl|[Dm GM]|]) [hl|'FM'|], probv (distAfter hdm [hl|[Dm GM]|]) [hl|'CM7'|]]
+    should = [0.5, 0.25, 0]
+    in
+    TestCase $ assertEqual "Harmony Distribution Model" should got
 
 

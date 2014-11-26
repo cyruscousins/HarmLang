@@ -55,8 +55,8 @@ data HarmonyDistributionModel = HarmonyDistributionModel Int (Data.Map.Map Chord
 
 type HDM = HarmonyDistributionModel
 
-buildHarmonyDistributionModel :: [ChordProgression] -> Int -> HarmonyDistributionModel
-buildHarmonyDistributionModel cpArr kVal =
+buildHarmonyDistributionModel :: Int -> [ChordProgression] -> HarmonyDistributionModel
+buildHarmonyDistributionModel kVal cpArr =
   let listVals = concat (map (sliceKmersWithLastSplit kVal) cpArr)
   --let listVals = foldr (++) [] (map (\ cp -> (map (\ kmer -> (take kVal kmer, last kmer) (sliceKmers (kVal + 1))  ))) cpArr) --TODO this is slow.
       listValLists = map (\ (key, val) -> (key, [val])) listVals

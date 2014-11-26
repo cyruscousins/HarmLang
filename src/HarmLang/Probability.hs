@@ -90,12 +90,13 @@ bindx dist f = resolve $ pmap f dist
 -----------------
 
 probv :: (Eq a) => Dist a -> a -> Double
-probv (Dist []) val = 0
+probv (Dist []) _ = 0
 probv (Dist xs) val =
     let vp ((v, p):xs) v' =
             if v == v'
             then p
             else vp xs v'
+        vp ([]) v' = 0
     in  vp xs val
 
 -- prob of seeing a value that matches the predicate
