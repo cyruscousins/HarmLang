@@ -30,7 +30,8 @@ tests = TestList [
                    TestLabel "Quasi quoting: Timed Chord Progression" testQuasiQuotingTimedChordProgression,
                    TestLabel "Quasi quoting: Interval" testQuasiQuotingInterval,
 
-                   TestLabel "ModelTests" testHarmonyDistributionModel]
+                   TestLabel "HarmonyDistributionModel Tests" testHarmonyDistributionModel,
+                   TestLabel "Test Inference" testHarmonyDistributionModel]
 
 -- parse tests
 testNote = let
@@ -128,6 +129,16 @@ testHarmonyDistributionModel = let
     hdm = buildHarmonyDistributionModel k [[hl|[Dm GM CM Dm GM CM]|], [hl|[Dm GM FM]|], [hl|[Dm GM E7]|]]
     got = [probv (distAfter hdm [hl|[Dm GM]|]) [hl|'CM'|], probv (distAfter hdm [hl|[Dm GM]|]) [hl|'FM'|], probv (distAfter hdm [hl|[Dm GM]|]) [hl|'CM7'|]]
     should = [0.5, 0.25, 0]
+    in
+    TestCase $ assertEqual "Harmony Distribution Model" should got
+
+testInference = let
+    k = 2
+    hdm1 = buildHarmonyDistributionModel k [[hl|[CM EM Am7 Dm7 G7 CM7]|], [hl|[CM EM Am7 D7 D#o7 CM7]|], [hl|[Dm7 G7 A7]|]]
+    hdm2 = buildHarmonyDistributionModel k [[hl|[CM EM Am7 Dm7 G7 CM7]|], [hl|[FMa7 F#o7 Gm7 C7 Am7 Dm7 Gm7 C7]|], [hl|[FMa7 F#o7 Gm7 C7 Am7 Dm7 Cm7 F7]|], [hl|[BbMa7 Abm7 Db7 GbMa7 Em7 A7 DMa7 Abm7 Db7 GbMa7 Gm7 C7]|], [hl|[FMa7 F#o7 Gm7 C7 Bb7 Am7 D7 Gm7 C7 FMa7 Gm7 C7]|]]
+    prog = [hl|[CM EM Am7 Dm7 G7 CM7]|]
+    got = inferStyle [hdm1, hdm2] prog
+    should = [0.25, 1]
     in
     TestCase $ assertEqual "Harmony Distribution Model" should got
 
