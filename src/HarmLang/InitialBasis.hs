@@ -131,7 +131,7 @@ instance Transposable Interval where
 
 --This one's a bit tricky, because the octave can change too!
 instance Transposable Pitch where
-  transpose (Pitch pco@(PitchClass c) o) io@(Interval i) = Pitch (transpose pco io) ((+) o (floor ((/) (fromIntegral ((+) c i)) 12)))
+  transpose (Pitch pco@(PitchClass c) (Octave o)) io@(Interval i) = Pitch (transpose pco io) (Octave ((+) o (floor ((/) (fromIntegral ((+) c i)) 12))))
 
 instance Transposable Note where
   transpose (Note p t) i = Note (transpose p i) t

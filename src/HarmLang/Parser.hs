@@ -101,8 +101,8 @@ parsePitch =
   do
     pc <- parsePitchClass
     char '@'
-    octave <- parseUInteger
-    return $ Pitch pc octave
+    o <- parseUInteger
+    return $ Pitch pc (Octave o)
 
 
 

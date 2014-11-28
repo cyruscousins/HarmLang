@@ -21,7 +21,7 @@ instance MIDIable ChordProgression where
 instance MIDIable NoteProgression where
     outputToMidi prog file = let
         convertToEvents [] = [(0,  TrackEnd)]
-        convertToEvents ((Note (Pitch (PitchClass p) o) (Time n d)):rest) = let
+        convertToEvents ((Note (Pitch (PitchClass p) (Octave o)) (Time n d)):rest) = let
             num = 24 + (12 * o) + p
             start = 0
             end = ((notelength * 2 * n) `div` d)

@@ -36,8 +36,11 @@ instance Enum Interval where
 	toEnum intval = Interval $ mod intval 12
 	fromEnum (Interval p) = p
 
+data Octave = Octave Int
+  deriving (Show, Eq, Data, Typeable)
+
 -- A pitchclass and an octave.
-data Pitch = Pitch PitchClass Int
+data Pitch = Pitch PitchClass Octave
   deriving (Show, Eq, Data, Typeable)
 
 -- Time is expressed as a fraction of a whole note.  The fraction is expected to be reduced.
