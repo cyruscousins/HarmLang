@@ -29,10 +29,7 @@ main =
 
     newKey <- fmap interpretPitchClass getLine
     putStrLn $ "Transposed 12 bar blues, to " ++ (show newKey) ++ " and output to blues.mid"
-    outputToMidi progression "blues.mid"
 
-    outputToMidi (arpeggiate progression) "arpeggio.mid"
+    outputToMidi (arpeggiate $ transpose progression (intervalAB [hl|'C'|] newKey)) "arpeggio.mid"
+    outputToMidi (transpose progression (intervalAB [hl|'C'|] newKey)) "blues.mid"
     putStrLn $ "Arpegiatted transposed blues to arpeggio.mid"
-
-    putStrLn . show $ transpose progression (intervalAB [hl|'C'|] newKey) --The original is written in C.  To transpose from C to the desired key, we need to find the interval from C to the desired key, accomplished via the initial basis function intervalAB.
-

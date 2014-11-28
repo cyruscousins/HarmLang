@@ -9,6 +9,7 @@ import Codec.Midi
 tempo = 500000
 granularity = 24
 notelength = granularity * 2
+basenote = 0
 
 -- http://stackoverflow.com/questions/26155872/creation-of-midi-file-in-haskell
 
@@ -22,7 +23,7 @@ instance MIDIable NoteProgression where
     outputToMidi prog file = let
         convertToEvents [] = [(0,  TrackEnd)]
         convertToEvents ((Note (Pitch (PitchClass p) (Octave o)) (Time n d)):rest) = let
-            num = 24 + (12 * o) + p
+            num = basenote + (12 * o) + p
             start = 0
             end = ((notelength * n) `div` d)
             in
@@ -34,7 +35,7 @@ instance MIDIable TimedChordProgression where
     outputToMidi prog file = let
         convertToEvents [] = [(0,  TrackEnd)]
         convertToEvents ((TimedChord (Harmony (PitchClass p) intervals) (Time n d)):rest) = let
-            root = 72 + p
+            root = basenote + (4 * 12) + p
             start = 0
             end = start + ((notelength * n) `div` d)
             others = map (\(Interval i) -> root + i) intervals
