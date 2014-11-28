@@ -5,7 +5,8 @@ DEPS=../src/HarmLang/Types.hs  \
 	 ../src/HarmLang/QuasiQuoter.hs  \
 	 ../src/HarmLang/Utility.hs  \
 	 ../src/HarmLang/Expression.hs  \
-	 ../src/HarmLang/InitialBasis.hs
+	 ../src/HarmLang/InitialBasis.hs \
+	 ../src/HarmLang/IO.hs
 
 all: cycle blues melody remove_object_files 
 
@@ -14,7 +15,6 @@ blues:
 
 cycle:
 	$(CC) $(DEPS) cycle.hs
-
 
 melody:
 	$(CC) $(DEPS) melody.hs

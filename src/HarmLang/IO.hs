@@ -9,13 +9,13 @@ import Codec.Midi
 -- http://stackoverflow.com/questions/26155872/creation-of-midi-file-in-haskell
 
 class MIDIable a where
-    outputToMIDI :: a -> String -> IO ()
+    outputToMidi :: a -> String -> IO ()
 
 instance MIDIable ChordProgression where
-    outputToMIDI prog file = outputToMIDI (map (\c -> TimedChord c $ Time 1 4) prog) file
+    outputToMidi prog file = outputToMidi (map (\c -> TimedChord c $ Time 1 4) prog) file
 
 instance MIDIable NoteProgression where
-    outputToMIDI prog file = let
+    outputToMidi prog file = let
         convertToEvents [] _ = [(0,  TrackEnd)]
         convertToEvents ((Note (Pitch (PitchClass p) o) (Time n d)):rest) start = let
             num = 24 + (12 * o) + p
@@ -26,7 +26,7 @@ instance MIDIable NoteProgression where
         writeMIDI (convertToEvents prog 0) file
 
 instance MIDIable TimedChordProgression where
-    outputToMIDI prog file = let
+    outputToMidi prog file = let
         convertToEvents [] _ = [(0,  TrackEnd)]
         convertToEvents ((TimedChord (Harmony (PitchClass p) intervals) (Time n d)):rest) start = let
             root = 72 + p

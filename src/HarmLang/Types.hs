@@ -4,7 +4,6 @@ module HarmLang.Types where
 import Data.Typeable
 import Data.Data
 
-
 -- An absolute class of pitches (element of Z12).
 data PitchClass = PitchClass Int
   deriving (Data, Typeable)
@@ -66,7 +65,7 @@ data TimedChord = TimedChord Chord Time deriving (Show, Eq, Data, Typeable)
 
 --TODO: Intervals, Times, and Harmonies have a logical normative representation, as well as other representations that aren't so logical.  Need to limit functionality so as to keep them in the normal forms.
 
-type ChordProgression = [Chord]
+type ChordProgression = [Chord] 
 type TimedChordProgression = [TimedChord]
 type NoteProgression = [Note]
 
