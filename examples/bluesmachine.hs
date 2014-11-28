@@ -8,6 +8,16 @@ import HarmLang.IO
 
 progression = [hl|[CM C7 F7 C7 G7 F7 G#7]|]
 
+arpeggiate :: ChordProgression -> NoteProgression
+arpeggiate [] = []
+arpeggiate ((Harmony root intervals):rest) = let 
+    rootnote = Note (Pitch root (Octave 3)) (Time 1 8)
+    others = map (\i -> transpose rootnote i) intervals
+    in
+    (rootnote:others) ++ arpeggiate rest
+
+
+
 
 main :: IO ()
 main = 
@@ -15,9 +25,14 @@ main =
     putStrLn "Welcome to the Blues Buddy!"
     putStrLn "Original 12 bar blues in C."
     putStrLn . show $ progression
-    outputToMidi progression "blues.mid"
     putStrLn "Please enter the key to which you wish to transpose."
+
     newKey <- fmap interpretPitchClass getLine
-    putStrLn $ "Transposed 12 bar blues, to " ++ (show newKey)
+    putStrLn $ "Transposed 12 bar blues, to " ++ (show newKey) ++ " and output to blues.mid"
+    outputToMidi progression "blues.mid"
+
+    outputToMidi (arpeggiate progression) "arpeggio.mid"
+    putStrLn $ "Arpegiatted transposed blues to arpeggio.mid"
+
     putStrLn . show $ transpose progression (intervalAB [hl|'C'|] newKey) --The original is written in C.  To transpose from C to the desired key, we need to find the interval from C to the desired key, accomplished via the initial basis function intervalAB.
 
