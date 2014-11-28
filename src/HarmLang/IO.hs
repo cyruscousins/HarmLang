@@ -24,7 +24,7 @@ instance MIDIable NoteProgression where
         convertToEvents ((Note (Pitch (PitchClass p) (Octave o)) (Time n d)):rest) = let
             num = 24 + (12 * o) + p
             start = 0
-            end = ((notelength * 2 * n) `div` d)
+            end = ((notelength * n) `div` d)
             in
             (start,  NoteOn 0 num 80):(end, NoteOn 0 num 0):(convertToEvents rest)
         in 
