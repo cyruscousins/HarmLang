@@ -2,3 +2,6 @@
 *.log
 .*.swp
 *.hi
+*.dyn*
+*.*hi
+
