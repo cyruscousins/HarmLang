@@ -28,7 +28,7 @@ cabal-version:       >=1.10
 
 library
   -- Modules exported by the library.
-  exposed-modules:   HarmLang.Interpreter, HarmLang.Parser, HarmLang.Types, HarmLang.InitialBasis, HarmLang.Expression, HarmLang.QuasiQuoter HarmLang.Probability HarmLang.HarmonyDistributionModel HarmLang.EuterpeaIntegration
+  exposed-modules:   HarmLang.Interpreter, HarmLang.Parser, HarmLang.Types, HarmLang.InitialBasis, HarmLang.Expression, HarmLang.QuasiQuoter HarmLang.Probability HarmLang.HarmonyDistributionModel HarmLang.IO
   
   -- Modules included in this library but not exported.
   other-modules:     HarmLang.Utility
@@ -42,7 +42,8 @@ library
                        HUnit,
                        parsec >= 3.1.0,
                        syb,
-                       Euterpea,
+                       HCodecs,
+                       -- Euterpea,
                        containers
   
   -- Directories containing source files.

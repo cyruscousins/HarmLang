@@ -68,4 +68,5 @@ data TimedChord = TimedChord Chord Time deriving (Show, Eq, Data, Typeable)
 
 type ChordProgression = [Chord]
 type TimedChordProgression = [TimedChord]
+type NoteProgression = [Note]
 
