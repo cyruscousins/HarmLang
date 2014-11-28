@@ -123,7 +123,7 @@ class Transposable a where
   transpose :: a -> Interval -> a
 
 instance Transposable PitchClass where
-  transpose (PitchClass p) (Interval i) = PitchClass $ toEnum ((+) p i)
+  transpose (PitchClass p) (Interval i) = PitchClass $ toEnum $ (p + i) `mod` 12
 
 
 instance Transposable Interval where
@@ -131,7 +131,10 @@ instance Transposable Interval where
 
 --This one's a bit tricky, because the octave can change too!
 instance Transposable Pitch where
-  transpose (Pitch pco@(PitchClass c) (Octave o)) io@(Interval i) = Pitch (transpose pco io) (Octave ((+) o (floor ((/) (fromIntegral ((+) c i)) 12))))
+  transpose (Pitch pco@(PitchClass c) (Octave o)) io@(Interval i) = let
+    o_delta = if (c + i) > 0 then (c + i) `div` 12 else ((-1) * (abs(c + i) `div` 12))
+    in
+    Pitch (transpose pco (Interval $ i)) (Octave $ o + o_delta)
 
 instance Transposable Note where
   transpose (Note p t) i = Note (transpose p i) t
@@ -191,9 +194,9 @@ takeByTime _ _ = []
 arpeggiate :: TimedChordProgression -> NoteProgression
 arpeggiate [] = []
 arpeggiate ((TimedChord (Harmony root intervals) (Time n d)):rest) = let 
-    rootnote = Note (Pitch root (Octave 3)) (Time 1 8)
+    rootnote = Note (Pitch root (Octave 3)) (Time 1 d)
     others = map (\i -> transpose rootnote i) intervals
-    notes = take (n * d `div` 8) (cycle $ rootnote:others)
+    notes = take n (cycle $ rootnote:others)
     in
     notes ++ arpeggiate rest
 

@@ -21,7 +21,7 @@ main =
     let newchords = transpose progression (intervalAB [hl|'C'|] newKey)
     outputToMidi newchords "blues.mid"
 
-    let timedchords = map (\c -> (TimedChord c (Time 8 8))) newchords
+    let timedchords = map (\c -> (TimedChord c (Time 1 5))) newchords
     let arpeggios = arpeggiate timedchords
 
     outputToMidi arpeggios "arpeggio.mid"
