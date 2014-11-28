@@ -188,6 +188,17 @@ takeByTime _ _ = []
 --timeMultiplier a Timed :: -> Time -> a
 
 
+arpeggiate :: TimedChordProgression -> NoteProgression
+arpeggiate [] = []
+arpeggiate ((TimedChord (Harmony root intervals) (Time n d)):rest) = let 
+    rootnote = Note (Pitch root (Octave 3)) (Time 1 8)
+    others = map (\i -> transpose rootnote i) intervals
+    notes = take (n * d `div` 8) (cycle $ rootnote:others)
+    in
+    notes ++ arpeggiate rest
+
+
+
 
 
 --TODO strip times

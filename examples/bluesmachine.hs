@@ -8,17 +8,6 @@ import HarmLang.IO
 
 progression = [hl|[CM C7 F7 C7 G7 F7 G#7]|]
 
-arpeggiate :: ChordProgression -> NoteProgression
-arpeggiate [] = []
-arpeggiate ((Harmony root intervals):rest) = let 
-    rootnote = Note (Pitch root (Octave 3)) (Time 1 8)
-    others = map (\i -> transpose rootnote i) intervals
-    in
-    (rootnote:others) ++ arpeggiate rest
-
-
-
-
 main :: IO ()
 main = 
   do
@@ -28,8 +17,16 @@ main =
     putStrLn "Please enter the key to which you wish to transpose."
 
     newKey <- fmap interpretPitchClass getLine
-    putStrLn $ "Transposed 12 bar blues, to " ++ (show newKey) ++ " and output to blues.mid"
 
-    outputToMidi (arpeggiate $ transpose progression (intervalAB [hl|'C'|] newKey)) "arpeggio.mid"
-    outputToMidi (transpose progression (intervalAB [hl|'C'|] newKey)) "blues.mid"
+    let newchords = transpose progression (intervalAB [hl|'C'|] newKey)
+    outputToMidi newchords "blues.mid"
+
+    let timedchords = map (\c -> (TimedChord c (Time 8 8))) progression
+    let arpeggios = arpeggiate $ transpose timedchords (intervalAB [hl|'C'|] newKey)
+    outputToMidi arpeggios "arpeggio.mid"
+
+    writeMidi [makeTrack arpeggios, makeTrack timedchords] "jazz.mid"
+
+    putStrLn $ "Transposed 12 bar blues, to " ++ (show newKey) ++ " and output to blues.mid"
     putStrLn $ "Arpegiatted transposed blues to arpeggio.mid"
+    putStrLn $ "Together in jazz.mid"
