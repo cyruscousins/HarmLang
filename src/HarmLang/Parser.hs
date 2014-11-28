@@ -94,6 +94,12 @@ parseNamedInterval =
 parseInterval :: GenParser Char st Interval
 parseInterval = (try parseNumericInterval) <|> (parseNamedInterval)
 
+parseOctave :: GenParser Char st Octave
+parseOctave = 
+  do
+    o <- parseUInteger
+    return $ Octave o
+
 -- Pitch parser
 
 parsePitch :: GenParser Char st Pitch
@@ -101,8 +107,8 @@ parsePitch =
   do
     pc <- parsePitchClass
     char '@'
-    o <- parseUInteger
-    return $ Pitch pc (Octave o)
+    o <- parseOctave
+    return $ Pitch pc o
 
 
 
