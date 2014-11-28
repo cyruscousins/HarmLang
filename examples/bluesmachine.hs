@@ -21,11 +21,12 @@ main =
     let newchords = transpose progression (intervalAB [hl|'C'|] newKey)
     outputToMidi newchords "blues.mid"
 
-    let timedchords = map (\c -> (TimedChord c (Time 8 8))) progression
-    let arpeggios = arpeggiate $ transpose timedchords (intervalAB [hl|'C'|] newKey)
+    let timedchords = map (\c -> (TimedChord c (Time 8 8))) newchords
+    let arpeggios = arpeggiate timedchords
+
     outputToMidi arpeggios "arpeggio.mid"
 
-    writeMidi [makeTrack arpeggios, makeTrack timedchords] "jazz.mid"
+    writeMidi [makeTrack arpeggios, makeTrack (transpose timedchords (Interval (-12)))] "jazz.mid"
 
     putStrLn $ "Transposed 12 bar blues, to " ++ (show newKey) ++ " and output to blues.mid"
     putStrLn $ "Arpegiatted transposed blues to arpeggio.mid"

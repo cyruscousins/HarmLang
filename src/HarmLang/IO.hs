@@ -24,26 +24,26 @@ instance MIDIable ChordProgression where
 
 instance MIDIable NoteProgression where
     makeTrack [] = [(0,  TrackEnd)]
-    makeTrack ((Note (Pitch (PitchClass p) (Octave o)) (Time n d)):rest) = let
+    makeTrack ((Note (Pitch (PitchClass p) (Octave o)) (Time n d)):rest) = (0, TempoChange tempo):(let
         num = basenote + (12 * o) + p
         start = 0
         end = ((notelength * n) `div` d)
         in
-        (0, TempoChange tempo):(start,  NoteOn 0 num 80):(end, NoteOn 0 num 0):(makeTrack rest)
+        (start,  NoteOn 0 num 80):(end, NoteOff 0 num 0):(makeTrack rest))
 
     outputToMidi prog file = writeMidi [(makeTrack prog)] file
 
 instance MIDIable TimedChordProgression where
     makeTrack [] = [(0,  TrackEnd)]
-    makeTrack ((TimedChord (Harmony (PitchClass p) intervals) (Time n d)):rest) = let
+    makeTrack ((TimedChord (Harmony (PitchClass p) intervals) (Time n d)):rest) = (0, TempoChange tempo):(let
         root = basenote + (4 * 12) + p
         start = 0
         end = start + ((notelength * n) `div` d)
         others = map (\(Interval i) -> root + i) intervals
         noteson  = map (\note -> (start, NoteOn 0 note 80)) (root:others)
-        notesoff = map (\note -> (end, NoteOn 0 note 0)) (root:others)
+        notesoff = (end, NoteOff 0 root 0):(map (\note -> (0, NoteOff 0 note 0)) others)
         in
-        (0, TempoChange tempo):noteson ++ notesoff ++ (makeTrack rest)
+        noteson ++ notesoff ++ (makeTrack rest))
 
     outputToMidi prog file = writeMidi [(makeTrack prog)] file
 
