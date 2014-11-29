@@ -109,7 +109,7 @@ probProgGivenModel hdm@(HarmonyDistributionModel thisK _) prog = product (map (\
 
 --(getK hdm)
 
-inferStyle :: [HarmonyDistributionModel] -> [Chord] -> [Probability]
+inferStyle :: [HarmonyDistributionModel] -> ChordProgression -> [Probability]
 --Fixed point style.
 --inferStyle models prog = map models ((flip probProgGivenModel) prog)
 inferStyle models prog = map (\ model -> probProgGivenModel model prog) models
