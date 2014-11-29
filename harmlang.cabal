@@ -29,7 +29,7 @@ cabal-version:       >=1.10
 library
   -- Modules exported by the library.
   exposed-modules:   HarmLang.Interpreter, HarmLang.Parser, HarmLang.Types, HarmLang.InitialBasis, HarmLang.Expression, HarmLang.QuasiQuoter HarmLang.Probability, HarmLang.HarmonyDistributionModel, HarmLang.ChordProgressionDatabase
---  exposed-modules:   HarmLang.Interpreter, HarmLang.Parser, HarmLang.Types, HarmLang.InitialBasis, HarmLang.Expression, HarmLang.QuasiQuoter HarmLang.Probability HarmLang.HarmonyDistributionModel, HarmLang,ChordProgressionDatabase, HarmLang.IO
+--  exposed-modules:   HarmLang.Interpreter, HarmLang.Parser, HarmLang.Types, HarmLang.InitialBasis, HarmLang.Expression, HarmLang.QuasiQuoter HarmLang.Probability HarmLang.HarmonyDistributionModel, HarmLang.ChordProgressionDatabase, HarmLang.IO
   
   -- Modules included in this library but not exported.
   other-modules:     HarmLang.Utility

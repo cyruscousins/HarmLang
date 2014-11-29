@@ -18,7 +18,7 @@ class MIDIable a where
     outputToMidi :: a -> String -> IO ()
 
 instance MIDIable ChordProgression where
-    makeTrack prog = makeTrack (map (\c -> TimedChord c $ Time 1 4) prog)
+    makeTrack prog = makeTrack (toTimedProgression (Time 1 4) prog)
 
     outputToMidi prog file = writeMidi [(makeTrack prog)] file
 

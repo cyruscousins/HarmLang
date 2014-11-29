@@ -22,7 +22,7 @@ getProgressionsInCategoryByCriterion (ChordProgressionDatabase list) criterion c
 
 getCategoriesInCriterion :: ChordProgressionDatabase -> String -> [String]
 --getCategoriesInCriterion (ChordProgressionDatabase list) criterion = Data.Map.mapMaybe ((flip Data.Map.lookup) criterion $ fst) list
-getCategoriesInCriterion (ChordProgressionDatabase list) criterion = Data.Maybe.mapMaybe (\ cpMap -> Data.Map.lookup criterion cpMap) (map fst list)
+getCategoriesInCriterion (ChordProgressionDatabase list) criterion = nub $ Data.Maybe.mapMaybe (\ cpMap -> Data.Map.lookup criterion cpMap) (map fst list)
 
 getProgressionsCategorizedByCriterion :: ChordProgressionDatabase -> String -> [(String, [TimedChordProgression])]
 getProgressionsCategorizedByCriterion cpd criterion = map (\catName -> (catName, getProgressionsInCategoryByCriterion cpd criterion catName)) $ getCategoriesInCriterion cpd criterion

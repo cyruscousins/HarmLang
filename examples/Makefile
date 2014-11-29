@@ -1,23 +1,30 @@
 CC=ghc
-DEPS=../src/HarmLang/Types.hs  \
+DEPSNOIO=../src/HarmLang/Types.hs  \
 	 ../src/HarmLang/Parser.hs  \
 	 ../src/HarmLang/Interpreter.hs  \
 	 ../src/HarmLang/QuasiQuoter.hs  \
 	 ../src/HarmLang/Utility.hs  \
 	 ../src/HarmLang/Expression.hs  \
 	 ../src/HarmLang/InitialBasis.hs \
+	 ../src/HarmLang/Probability.hs \
+	 ../src/HarmLang/HarmonyDistributionModel.hs \
+	 ../src/HarmLang/ChordProgressionDatabase.hs
+DEPS=$(DEPSNOIO)  \
 	 ../src/HarmLang/IO.hs
 
-all: cycle blues melody remove_object_files 
+all: cycle blues melody stylisticinference remove_object_files 
 
-blues:
+blues: blues.hs
 	$(CC) $(DEPS) bluesmachine.hs
 
-cycle:
+cycle: cycle.hs
 	$(CC) $(DEPS) cycle.hs
 
-melody:
+melody: melody.hs
 	$(CC) $(DEPS) melody.hs
+
+stylisticinference: stylisticinference.hs
+	$(CC) $(DEPSNOIO) stylisticinference.hs
 
 remove_object_files:
 	rm *.o *.hi *.dyn*
