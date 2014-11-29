@@ -21,7 +21,7 @@ all: cycle blues melody arpeggiatesong remove_object_files
 arpeggiatesong: arpeggiatesong.hs
 	$(CC) $(DEPS) arpeggiatesong.hs
 
-blues: blues.hs
+blues: bluesmachine.hs
 	$(CC) $(DEPS) bluesmachine.hs
 
 cycle: cycle.hs
