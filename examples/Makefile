@@ -33,9 +33,6 @@ melody: melody.hs
 stylisticinference: stylisticinference.hs
 	$(CC) $(DEPSNOIO) stylisticinference.hs
 
-melody:
-	$(CC) $(DEPS) melody.hs
-
 remove_object_files:
 	rm *.o *.hi *.dyn*
 
