@@ -14,43 +14,44 @@ basenote = 0
 -- http://stackoverflow.com/questions/26155872/creation-of-midi-file-in-haskell
 
 class MIDIable a where
+    makeTrack :: a -> Track Ticks
     outputToMidi :: a -> String -> IO ()
 
 instance MIDIable ChordProgression where
-    outputToMidi prog file = outputToMidi (map (\c -> TimedChord c $ Time 1 4) prog) file
+    makeTrack prog = makeTrack (map (\c -> TimedChord c $ Time 1 4) prog)
+
+    outputToMidi prog file = writeMidi [(makeTrack prog)] file
 
 instance MIDIable NoteProgression where
-    outputToMidi prog file = let
-        convertToEvents [] = [(0,  TrackEnd)]
-        convertToEvents ((Note (Pitch (PitchClass p) (Octave o)) (Time n d)):rest) = let
-            num = basenote + (12 * o) + p
-            start = 0
-            end = ((notelength * n) `div` d)
-            in
-            (start,  NoteOn 0 num 80):(end, NoteOn 0 num 0):(convertToEvents rest)
-        in 
-        writeMIDI (convertToEvents prog) file
+    makeTrack [] = [(0,  TrackEnd)]
+    makeTrack ((Note (Pitch (PitchClass p) (Octave o)) (Time n d)):rest) = (0, TempoChange tempo):(let
+        num = basenote + (12 * o) + p
+        start = 0
+        end = ((notelength * n) `div` d)
+        in
+        (start,  NoteOn 0 num 80):(end, NoteOff 0 num 0):(makeTrack rest))
+
+    outputToMidi prog file = writeMidi [(makeTrack prog)] file
 
 instance MIDIable TimedChordProgression where
-    outputToMidi prog file = let
-        convertToEvents [] = [(0,  TrackEnd)]
-        convertToEvents ((TimedChord (Harmony (PitchClass p) intervals) (Time n d)):rest) = let
-            root = basenote + (4 * 12) + p
-            start = 0
-            end = start + ((notelength * n) `div` d)
-            others = map (\(Interval i) -> root + i) intervals
-            noteson  = map (\note -> (start, NoteOn 0 note 80)) (root:others)
-            notesoff = map (\note -> (end, NoteOn 0 note 0)) (root:others)
-            in
-            noteson ++ notesoff ++ (convertToEvents rest)
-        in 
-        writeMIDI (convertToEvents prog) file
+    makeTrack [] = [(0,  TrackEnd)]
+    makeTrack ((TimedChord (Harmony (PitchClass p) intervals) (Time n d)):rest) = (0, TempoChange tempo):(let
+        root = basenote + (4 * 12) + p
+        start = 0
+        end = start + ((notelength * n) `div` d)
+        others = map (\(Interval i) -> root + i) intervals
+        noteson  = map (\note -> (start, NoteOn 0 note 80)) (root:others)
+        notesoff = (end, NoteOff 0 root 0):(map (\note -> (0, NoteOff 0 note 0)) others)
+        in
+        noteson ++ notesoff ++ (makeTrack rest))
+
+    outputToMidi prog file = writeMidi [(makeTrack prog)] file
 
 
-writeMIDI :: Track Ticks -> FilePath -> IO ()
-writeMIDI track file = 
+writeMidi :: [Track Ticks] -> FilePath -> IO ()
+writeMidi tracks file = 
     exportFile file midi
     where
     midi = Midi { fileType = SingleTrack, 
                 timeDiv  = TicksPerBeat granularity, 
-                tracks   = [(0, TempoChange tempo):track]}
+                tracks   = tracks}
