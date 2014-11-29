@@ -195,10 +195,10 @@ takeByTime _ _ = []
 
 --Add timing information to a progression
 toTimedProgression :: Time -> ChordProgression -> TimedChordProgression
-toTimedProgression time pro = (map (\c -> TimedChord c time) prog)
+toTimedProgression time prog = (map (\c -> TimedChord c time) prog)
 
 --Remove timing information from a progression.
-toUntimedProgression :: ChordProgression -> TimedChordProgression
+toUntimedProgression :: TimedChordProgression -> ChordProgression
 toUntimedProgression prog = (map (\ (TimedChord c _) -> c) prog)
 
 
