@@ -13,8 +13,15 @@ DEPS=$(DEPSNOIO)  \
 	 ../src/HarmLang/IO.hs
 
 all: cycle blues melody stylisticinference remove_object_files 
+	 ../src/HarmLang/ChordProgressionDatabase.hs \
+	 ../src/HarmLang/IO.hs
 
-blues: blues.hs
+all: cycle blues melody arpeggiatesong remove_object_files 
+
+arpeggiatesong: arpeggiatesong.hs
+	$(CC) $(DEPS) arpeggiatesong.hs
+
+blues: bluesmachine.hs
 	$(CC) $(DEPS) bluesmachine.hs
 
 cycle: cycle.hs
@@ -30,4 +37,4 @@ remove_object_files:
 	rm *.o *.hi *.dyn*
 
 clean:
-	rm -f cycle bluesmachine melody
+	rm -f cycle bluesmachine melody arpeggiatesong
