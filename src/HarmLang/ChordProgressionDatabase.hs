@@ -46,7 +46,7 @@ cpdEntryFromString str = let
   in (progMap, progression)
 
 cpdDbFromStrings :: [String] -> ChordProgressionDatabase
-cpdDbFromStrings strings = ChordProgressionDatabase (map cpdEntryFromString strings)
+cpdDbFromStrings strings = ChordProgressionDatabase (map cpdEntryFromString (filter (\ str -> (not $ null str) && ((/=) '#' (head str))) strings))
 
 loadChordProgressionDatabase :: String -> IO ChordProgressionDatabase
 loadChordProgressionDatabase fileName =
