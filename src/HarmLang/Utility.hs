@@ -14,3 +14,10 @@ removeAdjacentDups xs = remove xs
     remove (x1:x2:xs)
       | x1 == x2  = remove (x1:xs)
       | otherwise = x1 : remove (x2:xs)
+
+-- http://stackoverflow.com/questions/4978578/how-to-split-a-string-in-haskell
+separateBy :: Eq a => a -> [a] -> [[a]]
+separateBy chr = unfoldr sep where
+  sep [] = Nothing
+  sep l  = Just . fmap (drop 1) . break (==chr) $ l
+

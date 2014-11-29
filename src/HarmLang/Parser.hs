@@ -164,11 +164,15 @@ parseChordFromIntervals =
     intervals <- parseProgression parseInterval
     return $ Harmony root intervals
 
+parseChordNameString :: GenParser Char st String
+parseChordNameString = many1 $ oneOf(['0'..'9'] ++ ['a'..'z'] ++ ['A'..'Z'] ++ ['+', '-'])
+
+
 parseChordNamed :: GenParser Char st Chord
 parseChordNamed =
   do
     root <- parsePitchClass
-    name <- parseAlphaNumericString
+    name <- parseChordNameString
     return $ Harmony root $ chordNameToIntervalSet name
 
 strToChordSpecial :: String -> Chord
