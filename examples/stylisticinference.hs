@@ -15,6 +15,7 @@ summary ([]) = ""
 summary (item:more) = (fst item) ++ ": " ++ (show $ (length . snd) item) ++ "\n" ++ (summary more)
 
 probsToStr :: [Double] -> String
+probsToStr [] = ""
 probsToStr (a:[]) = show a
 probsToStr (a:b) = (show a) ++ ", " ++ (probsToStr b)
 
@@ -28,7 +29,10 @@ main = do
   let topClasses = (getTopCategories 4) (getByArtist cpd)
   putStrLn $ "Top Classes: " ++ (summary topClasses)
   let hdms = map (\ (name, progs) -> buildHarmonyDistributionModel 3 (map toUntimedProgression progs)) topClasses
-  putStrLn $ "Probs of first prog: " ++ (probsToStr $ inferStyle hdms (toUntimedProgression $ (head . snd . head) topClasses))
+  putStrLn $ "Probs of first prog: " ++ (show $ inferStyle hdms (toUntimedProgression $ (head . snd . head) topClasses))
   
+  --TODO probProgGivenModel does not always work.  What to do for when something isn't found???
   --TODO cheating, don't use training data!
+
+
 

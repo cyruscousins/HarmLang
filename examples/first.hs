@@ -29,6 +29,10 @@ tests = TestList [
                    TestLabel "Quasi quoting: Note Progression" testQuasiQuotingNoteProgression,
                    TestLabel "Quasi quoting: Timed Chord Progression" testQuasiQuotingTimedChordProgression,
                    TestLabel "Quasi quoting: Interval" testQuasiQuotingInterval,
+                   TestLabel "Quasi quoting: Whitespace" testQuasiQuotingInterval,
+
+                   TestLabel "Show: Test 1" testShow1,
+                   TestLabel "Show: Test 2" testShow2,
 
                    TestLabel "HarmonyDistributionModel Tests" testHarmonyDistributionModel,
                    TestLabel "Test Inference" testHarmonyDistributionModel]
@@ -122,8 +126,28 @@ testQuasiQuotingInterval = let
     in 
     TestCase $ assertEqual "Quasi quoting Interval test" should got 
 
+-- Quasiquoting with whitespace
+testQuasiQuotingWhitespace = let
+    got = [hl|
 
+   	'A'      |]
+    should = PitchClass 0
+    in
+    TestCase $ assertEqual "QuasiQuoting Whitespace" should got
 
+-- Test show
+testShow1 = let
+    original = [hl|'C#'|]
+    reparsed = interpretPitchClass (show original)
+    in
+    TestCase $ assertEqual "Show identity 1" original reparsed
+
+testShow2 = let
+    original = [hl| [C#m7:4/4 REST:4/4] |]
+    reparsed = interpretTimedChordProgression (show original)
+    in
+    TestCase $ assertEqual "Show identity 2" original reparsed
+--HDM
 testHarmonyDistributionModel = let
     k = 2
     hdm = buildHarmonyDistributionModel k [[hl|[Dm GM CM Dm GM CM]|], [hl|[Dm GM FM]|], [hl|[Dm GM E7]|]]
@@ -132,6 +156,7 @@ testHarmonyDistributionModel = let
     in
     TestCase $ assertEqual "Harmony Distribution Model" should got
 
+--Inference problem
 testInference = let
     k = 2
     hdm1 = buildHarmonyDistributionModel k [[hl|[CM EM Am7 Dm7 G7 CM7]|], [hl|[CM EM Am7 D7 D#o7 CM7]|], [hl|[Dm7 G7 A7]|]]

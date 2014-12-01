@@ -22,8 +22,10 @@ instance Show PitchClass where
 
 -- A relative change in pitches.
 data Interval = Interval Int  --TODO Better show?
-  deriving (Show, Data, Typeable)
+  deriving (Data, Typeable)
 
+instance Show Interval where
+  show (Interval interval) = show interval
 
 --TODO How?  Won't work with the other ==
 instance Eq Interval where
@@ -33,19 +35,28 @@ instance Ord Interval where
   (<=) (Interval a) (Interval b) = (Prelude.<=) (mod a 12) (mod b 12)
 
 instance Enum Interval where
-	toEnum intval = Interval $ mod intval 12
-	fromEnum (Interval p) = p
+  toEnum intval = Interval $ mod intval 12
+  fromEnum (Interval p) = p
 
 data Octave = Octave Int
-  deriving (Show, Eq, Data, Typeable)
+  deriving (Eq, Data, Typeable)
+
+instance Show Octave where
+  show (Octave oct) = show oct
 
 -- A pitchclass and an octave.
 data Pitch = Pitch PitchClass Octave
-  deriving (Show, Eq, Data, Typeable)
+  deriving (Eq, Data, Typeable)
+
+instance Show Pitch where
+  show (Pitch pc oct) = (show pc) ++ "@" ++ (show oct)
 
 -- Time is expressed as a fraction of a whole note.  The fraction is expected to be reduced.
 data Time = Time Int Int 
-  deriving (Show, Eq, Data, Typeable)
+  deriving (Eq, Data, Typeable)
+
+instance Show Time where
+  show (Time top bottom) = (show top) ++ ":" ++ (show bottom)
 
 --instance Eq Time where
 --  (==) (Time n1 d1) (Time n2 d2) = (Prelude.==) ((/) (toRational n1) (toRational d1)) ((/) (toRational n2) (toRational d2))
@@ -56,17 +67,23 @@ instance Ord Time where
     ((/) (toRational n1) (toRational d1)) 
     ((/) (toRational n2) (toRational d2))
 
-data Note = Note Pitch Time deriving (Show, Eq, Data, Typeable) --TODO At some point we want to add the option for a rest in here as well.
+data Note = Note Pitch Time deriving (Eq, Data, Typeable) --TODO At some point we want to add the option for a rest in here as well.
+
+instance Show Note where
+  show (Note pitch time) = (show pitch) ++ "/" ++ (show time)
 
 -- Chord datatype is represented as a root and a list of intervals from the root or a special case.
 -- The intervals are expected to be ordered and without repetition.
-data Chord = Harmony PitchClass [Interval] | Other String deriving (Show, Eq, Data, Typeable)
+data Chord = Harmony PitchClass [Interval] | Other String deriving (Eq, Data, Typeable)
 
+instance Show Chord where
+  show (Harmony pc ints) = (show pc) ++ (show ints)
+  show (Other str) = str
 
-data TimedChord = TimedChord Chord Time deriving (Show, Eq, Data, Typeable)
+data TimedChord = TimedChord Chord Time deriving (Eq, Data, Typeable)
 
-
---TODO: Intervals, Times, and Harmonies have a logical normative representation, as well as other representations that aren't so logical.  Need to limit functionality so as to keep them in the normal forms.
+instance Show TimedChord where
+  show (TimedChord chord time) = (show chord) ++ ":" ++ (show time)
 
 type ChordProgression = [Chord] 
 type TimedChordProgression = [TimedChord]

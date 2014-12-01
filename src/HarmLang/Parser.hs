@@ -27,7 +27,7 @@ parseWhiteSpace :: GenParser Char st ()
 parseWhiteSpace =
   do
     --TODO Maybe need to ensure at least one? (use many1)
-    _ <- char ' ' --TODO I pray that there is a better way.
+    _ <- oneOf " \t\n\r"
     --whocares <- many $ oneOf " \t\n\r" --Why does this not work?
     return () --return the unit (don't care about the whitespace).
 
@@ -212,10 +212,12 @@ parseTimedChord =
 
 parseProgression :: GenParser Char st a -> GenParser Char st [a] 
 parseProgression parser =
-  do 
+  do
+    many parseWhiteSpace
     string openProgression
-    progression <- sepBy parser parseWhiteSpace
+    progression <- sepBy parser (many1 parseWhiteSpace)
     string closeProgression
+    many parseWhiteSpace
     return progression 
 
 -- PITCH PROGRESSION PARSER
@@ -237,10 +239,12 @@ parseNoteProgression = parseProgression parseNote
 
 parseSingle :: GenParser Char st a -> GenParser Char st a
 parseSingle parser = 
-  do 
+  do
+    many parseWhiteSpace 
     string openSingle
     single <- parser
     string closeSingle
+    many parseWhiteSpace
     return single 
 
 -- PITCH CLASS PARSER
