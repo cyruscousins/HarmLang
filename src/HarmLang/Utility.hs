@@ -21,3 +21,13 @@ separateBy chr = unfoldr sep where
   sep [] = Nothing
   sep l  = Just . fmap (drop 1) . break (==chr) $ l
 
+-- A Cyrus Cousins original.
+allRotations :: [a] -> [[a]]
+allRotations l = map (\i -> take (length l) ((drop i) (cycle l))) [0..((-) (length l) 1)]
+
+-- https://www.haskell.org/pipermail/haskell-cafe/2003-June/004484.html
+powerset :: [a] -> [[a]]
+powerset [] = [[]]
+powerset (x:xs) = xss ++ map (x:) xss
+                  where xss = powerset xs
+

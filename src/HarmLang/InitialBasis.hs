@@ -6,6 +6,7 @@ module HarmLang.InitialBasis where
 
 import Data.Char
 import Data.Bits
+import qualified Data.List
 
 import HarmLang.Types
 import HarmLang.Utility
@@ -120,6 +121,14 @@ inverse (Interval a) = Interval (12 - a)
 toChord :: PitchClass -> [PitchClass] -> Chord
 toChord root rest = Harmony root $ sortedUnique (map (intervalAB $ root) rest)
 
+getNotesFromChord :: Chord -> [PitchClass]
+getNotesFromChord (Harmony r intervals) = r : (map (transpose r) intervals)
+getNotesFromChord _ = []
+
+--Get all the notes in a chord progression.
+getNotesFromChordProgression :: ChordProgression -> [PitchClass]
+getNotesFromChordProgression cp = Data.List.nub . concat $ map getNotesFromChord cp
+
 -- TYPECLASSES
 
 -- Many types are transposable, this means they can be transposed in the musical sense.
@@ -220,7 +229,7 @@ instance Enum Chord where
 numChordTypes :: Int
 numChordTypes = 2 ^ 11 --Chords implicitly have 1 note.
 
-allChordTypes :: [[Interval]]
+allChordTypes :: [ChordType]
 allChordTypes = [[]..(map Interval [1..11])]
 
 numChords :: Int 
@@ -228,6 +237,31 @@ numChords = 12 * numChordTypes
 
 allChords :: [Chord]
 allChords = [(Harmony (PitchClass 0) [])..(Harmony (PitchClass 11) (map Interval [1..11]))]
+
+allIntervals :: [Interval]
+allIntervals = map Interval [0..11]
+
+allNonzeroIntervals :: [Interval]
+allNonzeroIntervals = map Interval [1..11]
+
+allPitchClasses :: [PitchClass]
+allPitchClasses = map PitchClass [0..11]
+
+
+--Get all the inversions of a chord
+chordInversions :: Chord -> [Chord]
+chordInversions chord@(Harmony pc ints) =
+  let
+    allNotes = getNotesFromChord chord
+    allNoteRotations = allRotations allNotes
+  in
+    map (\l -> toChord (head l) (tail l)) allNoteRotations
+chordInversions other = [other]
+
+
+
+
+
 
 
 

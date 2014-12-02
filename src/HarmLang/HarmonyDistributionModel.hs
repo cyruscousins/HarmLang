@@ -3,6 +3,7 @@ module HarmLang.HarmonyDistributionModel
 where
 
 import HarmLang.Types
+import HarmLang.InitialBasis
 
 import HarmLang.Probability
 
@@ -20,14 +21,7 @@ instance Ord Chord where
   (<=) (Other a) (Other b) = a <= b
   (<=) (Other a) _ = True
   (<=) _ (Other b) = False
-  (<=) h1@(Harmony pc1 ints1) h2@(Harmony pc2 ints2) = (harmonyToInt h1) <= (harmonyToInt h2)
-
-intervalToInt :: Interval -> Int
-intervalToInt (Interval a) = a
-
-harmonyToInt :: Chord -> Int
-harmonyToInt (Harmony (PitchClass pc) intervals) = 2 ^ 12 * (mod pc 12) + (sum (map (\ interval -> 2 ^ (intervalToInt interval)) intervals))
-
+  (<=) h1@(Harmony pc1 ints1) h2@(Harmony pc2 ints2) = (fromEnum h1) <= (fromEnum h2)
 
 --HarmonyDistributionModel
 
@@ -50,20 +44,24 @@ sliceKmersWithLastSplit i cp = map splitLast $ sliceKmers (i + 1) cp
 k :: Int
 k = 3
 
-data HarmonyDistributionModel = HarmonyDistributionModel Int (Data.Map.Map ChordProgression ChordDistribution) --Double (ChordProgression -> Double) (Map ChordProgression Chord)
+
+type Prior = (ChordProgression -> ChordDistribution)
+
+data HarmonyDistributionModel = HDMTC Int Prior (Data.Map.Map ChordProgression ChordDistribution)
+
 --type HarmDistModel HarmonyDistributionModel
 
 type HDM = HarmonyDistributionModel
 
 buildHarmonyDistributionModel :: Int -> [ChordProgression] -> HarmonyDistributionModel
-buildHarmonyDistributionModel kVal cpArr =
+buildHarmonyDistributionModel kVal cpArr = --TODO actually apply the PRIOR!
   let listVals = concat (map (sliceKmersWithLastSplit kVal) cpArr)
   --let listVals = foldr (++) [] (map (\ cp -> (map (\ kmer -> (take kVal kmer, last kmer) (sliceKmers (kVal + 1))  ))) cpArr) --TODO this is slow.
       listValLists = map (\ (key, val) -> (key, [val])) listVals
       mapAll = Data.Map.fromListWith (++) listValLists
       --mapAllSorted = map List.sort mapAll
       mapAllDist = Data.Map.map equally mapAll
-  in HarmonyDistributionModel kVal mapAllDist
+  in HDMTC kVal (\ _ -> equally allChords) mapAllDist --TODO laplacian prior is baked in here.
     
 
 hdmChoose :: Double -> HDM -> HDM -> HDM
@@ -71,17 +69,17 @@ hdmChoose = error "No hdm choose."
 
 --TODO Switch to pattern matching
 hdmAskK :: HDM -> Int
-hdmAskK (HarmonyDistributionModel kVal _) = kVal
+hdmAskK (HDMTC kVal _ _) = kVal
 
 -- chord progression must be of length k
 --TODO no error, return a Maybe.
 distAfter :: HDM -> ChordProgression -> Dist Chord
-distAfter (HarmonyDistributionModel thisK hdmMap) cp =
+distAfter (HDMTC thisK prior hdmMap) cp =
   if length cp /= thisK
   then error "bad cp length"
   else let mapVal = Data.Map.lookup cp hdmMap 
        in case (mapVal) of
-         Nothing -> error "did not find case." --TODO even distribution?
+         Nothing -> (prior cp) -- error "did not find case." --Use prior when nothing is available.
          Just d -> d
                    
 
@@ -105,7 +103,7 @@ generate hdm cp lenToGen = generate hdm (extend hdm cp) (lenToGen - 1)
 
 --Calculates P(progression | HarmonyDistributionModel), or probability of generating a progression from a generative model.
 probProgGivenModel :: HarmonyDistributionModel -> ChordProgression -> Probability
-probProgGivenModel hdm@(HarmonyDistributionModel thisK _) prog = product (map (\ (kmer, nextVal) -> probv (distAfter hdm kmer) nextVal )  (sliceKmersWithLastSplit thisK prog) )
+probProgGivenModel hdm@(HDMTC thisK _ _) prog = product (map (\ (kmer, nextVal) -> probv (distAfter hdm kmer) nextVal )  (sliceKmersWithLastSplit thisK prog) )
 
 --(getK hdm)
 

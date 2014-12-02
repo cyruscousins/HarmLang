@@ -93,13 +93,14 @@ instance Show TimedChord where
 type ChordProgression = [Chord] 
 type TimedChordProgression = [TimedChord]
 type NoteProgression = [Note]
+type ChordType = [Interval] --TODO should be a fully fledged Data, and should check conditions.
 
 hlArrayStr :: (Show a) => [a] -> String
 hlArrayStr arr = "[" ++ (intercalate " " (map show arr)) ++ "]"
 
 --Boilerplate to override default list show, to get HarmLang types to show values that can be interpreted.
 
-instance Show [Interval] where
+instance Show ChordType where
   show arr = hlArrayStr arr
 
 instance Show ChordProgression where --TODO TypeSynonymInstances?
@@ -110,4 +111,5 @@ instance Show TimedChordProgression where
 
 instance Show NoteProgression where
   show arr = hlArrayStr arr
+
 
