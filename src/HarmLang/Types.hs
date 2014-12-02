@@ -1,8 +1,13 @@
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverlappingInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module HarmLang.Types where
+
 import Data.Typeable
 import Data.Data
+import Data.List
 
 -- An absolute class of pitches (element of Z12).
 data PitchClass = PitchClass Int
@@ -56,7 +61,7 @@ data Time = Time Int Int
   deriving (Eq, Data, Typeable)
 
 instance Show Time where
-  show (Time top bottom) = (show top) ++ ":" ++ (show bottom)
+  show (Time top bottom) = (show top) ++ "/" ++ (show bottom)
 
 --instance Eq Time where
 --  (==) (Time n1 d1) (Time n2 d2) = (Prelude.==) ((/) (toRational n1) (toRational d1)) ((/) (toRational n2) (toRational d2))
@@ -70,7 +75,7 @@ instance Ord Time where
 data Note = Note Pitch Time deriving (Eq, Data, Typeable) --TODO At some point we want to add the option for a rest in here as well.
 
 instance Show Note where
-  show (Note pitch time) = (show pitch) ++ "/" ++ (show time)
+  show (Note pitch time) = (show pitch) ++ ":" ++ (show time)
 
 -- Chord datatype is represented as a root and a list of intervals from the root or a special case.
 -- The intervals are expected to be ordered and without repetition.
@@ -88,4 +93,21 @@ instance Show TimedChord where
 type ChordProgression = [Chord] 
 type TimedChordProgression = [TimedChord]
 type NoteProgression = [Note]
+
+hlArrayStr :: (Show a) => [a] -> String
+hlArrayStr arr = "[" ++ (intercalate " " (map show arr)) ++ "]"
+
+--Boilerplate to override default list show, to get HarmLang types to show values that can be interpreted.
+
+instance Show [Interval] where
+  show arr = hlArrayStr arr
+
+instance Show ChordProgression where --TODO TypeSynonymInstances?
+  show arr = hlArrayStr arr
+
+instance Show TimedChordProgression where
+  show arr = hlArrayStr arr
+
+instance Show NoteProgression where
+  show arr = hlArrayStr arr
 

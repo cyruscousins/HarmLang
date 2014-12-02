@@ -29,10 +29,12 @@ tests = TestList [
                    TestLabel "Quasi quoting: Note Progression" testQuasiQuotingNoteProgression,
                    TestLabel "Quasi quoting: Timed Chord Progression" testQuasiQuotingTimedChordProgression,
                    TestLabel "Quasi quoting: Interval" testQuasiQuotingInterval,
-                   TestLabel "Quasi quoting: Whitespace" testQuasiQuotingInterval,
+                   TestLabel "Quasi quoting: Whitespace 1" testQuasiQuotingInterval,
+                   TestLabel "Quasi quoting: Whitespace 2" testQuasiQuotingInterval,
 
                    TestLabel "Show: Test 1" testShow1,
                    TestLabel "Show: Test 2" testShow2,
+                   TestLabel "Show: Test 3" testShow3,
 
                    TestLabel "HarmonyDistributionModel Tests" testHarmonyDistributionModel,
                    TestLabel "Test Inference" testHarmonyDistributionModel]
@@ -127,13 +129,25 @@ testQuasiQuotingInterval = let
     TestCase $ assertEqual "Quasi quoting Interval test" should got 
 
 -- Quasiquoting with whitespace
-testQuasiQuotingWhitespace = let
+testQuasiQuotingWhitespace1 = let
     got = [hl|
 
    	'A'      |]
     should = PitchClass 0
     in
     TestCase $ assertEqual "QuasiQuoting Whitespace" should got
+
+testQuasiQuotingWhitespace2 = let
+    got = [hl|   [A@7:4] 
+
+
+  |]
+    should = [Note (Pitch (PitchClass 0) (Octave 4)) (Time 7 4)]
+    in
+    TestCase $ assertEqual "QuasiQuoting Whitespace 2" should got
+
+
+-- Test show
 
 -- Test show
 testShow1 = let
@@ -147,6 +161,13 @@ testShow2 = let
     reparsed = interpretTimedChordProgression (show original)
     in
     TestCase $ assertEqual "Show identity 2" original reparsed
+
+testShow3 = let
+    original = [hl| [A@4:2/4  B@4:1/4 C@4:1/4] |]
+    reparsed = interpretNoteProgression (show original)
+    in
+    TestCase $ assertEqual "Show identity 2" original reparsed
+
 --HDM
 testHarmonyDistributionModel = let
     k = 2

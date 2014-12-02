@@ -50,6 +50,7 @@ In our grammar, we attempted to conform to the ISO 14977 standard for the Extend
 
 <whitespace> = <whitespacechar>, \{<whitespacechar>\} ;
 
+<optionalwhitespace> = \{<whitespacechar>\} ;
 
 %<digitnzero> = "\"1\"" | "\"2\"" | "\"3\"" | "\"4\"" | "\"5\"" | "\"6\"" | "\"7\"" | "\"8\"" | "\"9\"" ;
 
@@ -111,8 +112,7 @@ The following are types that have special syntax for literal values in HarmLang,
 
 <numinterval> = <int> ;
 
-<namedinterval> = "\"0th\"" | "\"U\"" | "\"unison\"" | "\"m2nd\"" | "\"-2nd\"" | "\"minorsecond\"" | "\"2nd\"" | "\"second\"" | "\"m3rd\"" | "\"-3rd\"" | "\"minorthird\"" | "\"3rd\"" | "\"third\"" | "\"4th\"" | "\"fourth\"" | "\"+4th\"" | "\"#4th\"" | "\"augmentedfourth\"" | "\"-5th\"" | "\"d5th\"" | "\"o5th\"" | "\"b5th\"" | "\"diminishedfifth\"" | "\"tritone\"" | "\"5th\"" | "\"fifth\"" | "\"+5th\"" | "\"augmentedfifth\"" | "\"m6th\"" | "\"-6th\"" | "\"minorsixth\"" | "\"6th\"" | "\"sixth\"" | "7th"0
-"\"d7th\"" | "\"dom7th\"" | "\"b7th\"" | "\"seventh\"" | "\"minorseventh\"" | "\"dominantseventh\"" | "\"ma7th\"" | "\"majorseventh\"" | "\"octave\"" ;
+%<namedinterval> = "\"0th\"" | "\"U\"" | "\"unison\"" | "\"m2nd\"" | "\"-2nd\"" | "\"minorsecond\"" | "\"2nd\"" | "\"second\"" | "\"m3rd\"" | "\"-3rd\"" | "\"minorthird\"" | "\"3rd\"" | "\"third\"" | "\"4th\"" | "\"fourth\"" | "\"+4th\"" | "\"#4th\"" | "\"augmentedfourth\"" | "\"-5th\"" | "\"d5th\"" | "\"o5th\"" | "\"b5th\"" | "\"diminishedfifth\"" | "\"tritone\"" | "\"5th\"" | "\"fifth\"" | "\"+5th\"" | "\"augmentedfifth\"" | "\"m6th\"" | "\"-6th\"" | "\"minorsixth\"" | "\"6th\"" | "\"sixth\"" | "7th" | "\"d7th\"" | "\"dom7th\"" | "\"b7th\"" | "\"seventh\"" | "\"minorseventh\"" | "\"dominantseventh\"" | "\"ma7th\"" | "\"majorseventh\"" | "\"octave\"" ;
 
 
 %<diatonicintervalname> = "\"2nd\"" | "\"3rd\"" | "\"4th\"" |  "\"5th\"" | "\"6th\"" | "\"7th\"" ;
@@ -123,7 +123,7 @@ The following are types that have special syntax for literal values in HarmLang,
 %<interval> = <numinterval> | <namedinterval> ;
 <interval> = <numinterval> ;
 
-<rest> = "\"_\"" | "\"REST\"" | "\"SILENCE\"" ;
+<rest> = "\"\_\"" | "\"REST\"" | "\"SILENCE\"" ;
 
 <begin> = "\"BEGIN\"" | "\"START\"" ;
 
@@ -131,7 +131,6 @@ The following are types that have special syntax for literal values in HarmLang,
 
 <specialharmony> = <rest> | <begin> | <end> ; %TODO
 
-%Currently, can't just say C to reference a C major chord.  Add this?
 <namedchord> = "\"5\"" | "\"M\"" | "\"m\"" | "\"b5\"" | "\"dim\"" | "\"o\"" | "\"7\"" | "\"Ma7\"" | "\"m7\"" | "\"mMa7\"" | "\"m7b5\"" | "\"dim7\"" | "\"o7\"" | "\"9\"" | "\"b9\"" | "\"#9\"" | "\"Ma9\"" | "\"m11\"" | "\"7b6\"" | "\"13\"" | "\"Ma13\"" ;
 
 <chord> = <pitchclass>, "\"[\"", \{<interval>, "\" \""\}, "\"]\"" \\
@@ -143,8 +142,8 @@ The following are types that have special syntax for literal values in HarmLang,
 
 <parsabletype> = <interval> |<pitchclass> | <pitch> | <note> | <chord> | <timedchord> ;
 
-<singleton> = "\"'\"", <parseabletype>, "\"'\"" ;
-<progression> = "\"[\"", <parseabletype>, "\"'\"" ;
+<singleton> = <optionalwhitespace>, "\"'\"", <parseabletype>, "\"'\"", <optionalwhitespace> ;
+<progression> = <optionalwhitespace>, "\"[\"", <parseabletype>, "\"'\"", <optionalwhitespace> ;
 
 %<chordprogression> = \{<chord>, <whitespace>\} ;
 

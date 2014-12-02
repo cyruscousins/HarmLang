@@ -176,6 +176,16 @@ parseChordNamed =
     return $ Harmony root $ chordNameToIntervalSet name
 
 strToChordSpecial :: String -> Chord
+strToChordSpecial "_" = Other "REST"
+strToChordSpecial "REST" = Other "REST"
+strToChordSpecial "SILENCE" = Other "REST"
+strToChordSpecial "BEGIN" = Other "BEGIN"
+strToChordSpecial "START" = Other "BEGIN"
+strToChordSpecial "END" = Other "END"
+strToChordSpecial _ = error "Invalid special chord."
+
+{-
+strToChordSpecial :: String -> Chord
 strToChordSpecial "_" = Other "Rest"
 strToChordSpecial "REST" = Other "Rest"
 strToChordSpecial "SILENCE" = Other "Rest"
@@ -183,13 +193,14 @@ strToChordSpecial "BEGIN" = Other "Begin"
 strToChordSpecial "START" = Other "Begin"
 strToChordSpecial "END" = Other "End"
 strToChordSpecial _ = error "Invalid special chord."
+-}
 
 -- Parse a rest (Just '_')
 parseChordFromOtherNotation :: GenParser Char st Chord
 parseChordFromOtherNotation =
   do --TODO: Surely there is a function to do this
     str <- (string "_") <|> (string "REST") <|> (string "SILENCE") <|> (string "START") <|> (string "END")
-    return $ strToChordSpecial str
+    return $ strToChordSpecial (map toUpper str)
 
 parseQuotedOther :: GenParser Char st Chord
 parseQuotedOther =
@@ -215,7 +226,9 @@ parseProgression parser =
   do
     many parseWhiteSpace
     string openProgression
+    many parseWhiteSpace
     progression <- sepBy parser (many1 parseWhiteSpace)
+    many parseWhiteSpace
     string closeProgression
     many parseWhiteSpace
     return progression 
