@@ -36,6 +36,11 @@ tests = TestList [
                    TestLabel "Show: Test 2" testShow2,
                    TestLabel "Show: Test 3" testShow3,
 
+                   TestLabel "Test Chord Enum 1" testChordEnum1,
+                   TestLabel "Test Chord Enum 2" testChordEnum2,
+                   TestLabel "Test Chord Enum 3" testChordEnum3,
+                   TestLabel "Test Chord Enum 4" testChordEnum4,
+
                    TestLabel "HarmonyDistributionModel Tests" testHarmonyDistributionModel,
                    TestLabel "Test Inference" testHarmonyDistributionModel]
 
@@ -167,6 +172,24 @@ testShow3 = let
     reparsed = interpretNoteProgression (show original)
     in
     TestCase $ assertEqual "Show identity 2" original reparsed
+
+--Test chord enum
+
+testChordEnum1 = let
+    original = map Interval [1..11]
+    new = (toEnum . fromEnum) original
+    in
+    TestCase $ assertEqual "Test Chord Enum 1" original new
+
+testChordEnum2 = let
+    original = Harmony (PitchClass 0) (map Interval [1..11])
+    new = (toEnum . fromEnum) original
+    in
+    TestCase $ assertEqual "Test Chord Enum 2" original new
+
+testChordEnum3 = TestCase $ assertEqual "Test Chord Enum 3" (length allChordTypes) numChordTypes
+
+testChordEnum4 = TestCase $ assertEqual "Test Chord Enum 4" (length allChords) numChords
 
 --HDM
 testHarmonyDistributionModel = let

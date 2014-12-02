@@ -1,6 +1,11 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverlappingInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+
 module HarmLang.InitialBasis where
 
 import Data.Char
+import Data.Bits
 
 import HarmLang.Types
 import HarmLang.Utility
@@ -85,7 +90,7 @@ chordNameToIntervalSet name =
     nToInts "+" = [4,8]
     nToInts "7" = [4,7,10]
     nToInts "Ma7" = [4,7,11] --TODO delta 7
-    nToInts "ma7" = [4,7,11] --TODO delta 7
+    nToInts "ma7" = [4,7,11]
     nToInts "M7" = [4,7,11]
     nToInts "m7" = [3,7,10]
     nToInts "mMa7" = [3,7,11]
@@ -114,7 +119,6 @@ inverse (Interval a) = Interval (12 - a)
 
 toChord :: PitchClass -> [PitchClass] -> Chord
 toChord root rest = Harmony root $ sortedUnique (map (intervalAB $ root) rest)
---TODO: This absolutely won't work without nub and sort!!!
 
 -- TYPECLASSES
 
@@ -202,6 +206,29 @@ toUntimedProgression :: TimedChordProgression -> ChordProgression
 toUntimedProgression prog = (map (\ (TimedChord c _) -> c) prog)
 
 
+--Enumeration of Chords
+
+instance Enum [Interval] where
+  toEnum intVal = map Interval $ filter (\a -> ((/=) 0) $ (.&.) intVal (2^(a-1))) [1..11]
+  fromEnum intervals = sum $ map (\ interval -> 2 ^ (fromEnum interval - 1)) intervals
+
+--Chord enum
+instance Enum Chord where
+  toEnum intVal = Harmony (PitchClass ((div) intVal (numChordTypes))) (toEnum intVal)
+  fromEnum (Harmony (PitchClass pc) intervals) = pc * (numChordTypes) + (fromEnum intervals)
+
+numChordTypes :: Int
+numChordTypes = 2 ^ 11 --Chords implicitly have 1 note.
+
+allChordTypes :: [[Interval]]
+allChordTypes = [[]..(map Interval [1..11])]
+
+numChords :: Int 
+numChords = 12 * numChordTypes
+
+allChords :: [Chord]
+allChords = [(Harmony (PitchClass 0) [])..(Harmony (PitchClass 11) (map Interval [1..11]))]
+
 
 
 arpeggiate :: TimedChordProgression -> NoteProgression
@@ -215,6 +242,3 @@ arpeggiate ((TimedChord (Harmony root intervals) (Time n d)):rest) = let
 
 
 
-
-
---TODO strip times

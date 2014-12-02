@@ -44,7 +44,7 @@ instance Enum Interval where
   fromEnum (Interval p) = p
 
 data Octave = Octave Int
-  deriving (Eq, Data, Typeable)
+  deriving (Eq, Ord, Data, Typeable)
 
 instance Show Octave where
   show (Octave oct) = show oct
