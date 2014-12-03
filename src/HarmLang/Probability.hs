@@ -186,3 +186,11 @@ joint :: (Eq a, Eq b) => Dist a -> Dist b -> Dist (a, b)
 joint (Dist as) (Dist bs) = Dist [ ((a, b), pa * pb) | (a, pa) <- as, (b, pb) <- bs]
 -}
 
+choose :: (Eq a) => Double -> Dist a -> Dist a -> Dist a
+choose val (Dist l1) (Dist l2) =
+  let
+    dmult mVal = map (\(a, b) -> (a, b * mVal))
+  in
+    Dist (regroup ((dmult val l1) ++ (dmult (1 - val) l2)))
+
+

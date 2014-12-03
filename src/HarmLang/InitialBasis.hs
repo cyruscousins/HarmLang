@@ -258,6 +258,9 @@ chordInversions chord@(Harmony pc ints) =
     map (\l -> toChord (head l) (tail l)) allNoteRotations
 chordInversions other = [other]
 
+--Are the provided chords inversions of one another?
+isInversion :: Chord -> Chord -> Bool
+isInversion c1 c2 = elem c2 (chordInversions c1)
 
 
 

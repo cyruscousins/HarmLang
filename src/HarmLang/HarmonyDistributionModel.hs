@@ -4,14 +4,13 @@ where
 
 import HarmLang.Types
 import HarmLang.InitialBasis
+import HarmLang.Priors
 
 import HarmLang.Probability
 
 import qualified Data.Map 
 
 --DIST:
-
-type ChordDistribution = (Dist Chord)
 
 type Probability = Double
 
@@ -44,25 +43,48 @@ sliceKmersWithLastSplit i cp = map splitLast $ sliceKmers (i + 1) cp
 k :: Int
 k = 3
 
-
-type Prior = (ChordProgression -> ChordDistribution)
-
 data HarmonyDistributionModel = HDMTC Int Prior (Data.Map.Map ChordProgression ChordDistribution)
 
 --type HarmDistModel HarmonyDistributionModel
 
 type HDM = HarmonyDistributionModel
 
-buildHarmonyDistributionModel :: Int -> [ChordProgression] -> HarmonyDistributionModel
-buildHarmonyDistributionModel kVal cpArr = --TODO actually apply the PRIOR!
+--2 helper functions
+
+cpFirstInterval :: ChordProgression -> Interval
+cpFirstInterval cp@((Harmony (PitchClass p) _):_) = Interval p
+cpFirstIntreval _ = Interval 0
+
+{-
+transposeToA :: ChordProgression -> ChordProgression
+transposeToA cp = transpose cp (inverse (cpFirstInterval cp))
+-}
+
+transposeToA :: (ChordProgression, Chord) -> (ChordProgression, Chord)
+transposeToA (cp, chord) = (transpose cp (inverse (cpFirstInterval cp)), transpose chord (inverse (cpFirstInterval cp)))
+
+dplus :: Double -> Double -> Double
+dplus = (+)
+
+ddiv :: Double -> Double -> Double
+ddiv = (/)
+
+--Function used to build a harmony distribution model
+buildHarmonyDistributionModelWithPrior :: Int -> Prior -> Double -> [ChordProgression] -> HarmonyDistributionModel
+buildHarmonyDistributionModelWithPrior kVal prior priorWeight cpArr =
   let listVals = concat (map (sliceKmersWithLastSplit kVal) cpArr)
-  --let listVals = foldr (++) [] (map (\ cp -> (map (\ kmer -> (take kVal kmer, last kmer) (sliceKmers (kVal + 1))  ))) cpArr) --TODO this is slow.
-      listValLists = map (\ (key, val) -> (key, [val])) listVals
+      --Greatest Hack of all time.  Transpose everything to starting on an A.
+      listValsTransposed = map transposeToA listVals --This is where Key Agnosticism occurs
+      listValLists = map (\ (key, val) -> (key, [val])) listValsTransposed
       mapAll = Data.Map.fromListWith (++) listValLists
       --mapAllSorted = map List.sort mapAll
-      mapAllDist = Data.Map.map equally mapAll
-  in HDMTC kVal (\ _ -> equally allChords) mapAllDist --TODO laplacian prior is baked in here.
-    
+      mapAllDist = if priorWeight == 0
+                   then Data.Map.map equally mapAll
+                   else Data.Map.mapWithKey (\ before afters -> choose (ddiv priorWeight (dplus priorWeight (fromIntegral $ length afters))) (prior before) (equally afters)) mapAll
+  in HDMTC kVal prior mapAllDist
+
+buildHarmonyDistribution :: Int -> [ChordProgression] -> HarmonyDistributionModel
+buildHarmonyDistribution kVal = buildHarmonyDistributionModelWithPrior kVal laplacianPrior 0
 
 hdmChoose :: Double -> HDM -> HDM -> HDM
 hdmChoose = error "No hdm choose."
