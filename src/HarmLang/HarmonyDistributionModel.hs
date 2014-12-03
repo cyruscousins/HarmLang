@@ -1,3 +1,6 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverlappingInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module HarmLang.HarmonyDistributionModel
 where
@@ -13,6 +16,10 @@ import qualified Data.Map
 --DIST:
 
 type Probability = Double
+
+instance Transposable ChordDistribution where
+  transpose (Dist list) interval = Dist $ map (\ (chord, prob) -> (transpose chord interval, prob)) list
+
 
 --In a HDM, chords are ordered (to use the map)
 
@@ -49,16 +56,14 @@ data HarmonyDistributionModel = HDMTC Int Prior (Data.Map.Map ChordProgression C
 
 type HDM = HarmonyDistributionModel
 
---2 helper functions
+--5 very silly helper functions
 
 cpFirstInterval :: ChordProgression -> Interval
 cpFirstInterval cp@((Harmony (PitchClass p) _):_) = Interval p
 cpFirstIntreval _ = Interval 0
 
-{-
-transposeToA :: ChordProgression -> ChordProgression
-transposeToA cp = transpose cp (inverse (cpFirstInterval cp))
--}
+transposeCpToA :: ChordProgression -> ChordProgression
+transposeCpToA cp = transpose cp (inverse (cpFirstInterval cp))
 
 transposeToA :: (ChordProgression, Chord) -> (ChordProgression, Chord)
 transposeToA (cp, chord) = (transpose cp (inverse (cpFirstInterval cp)), transpose chord (inverse (cpFirstInterval cp)))
@@ -83,8 +88,8 @@ buildHarmonyDistributionModelWithPrior kVal prior priorWeight cpArr =
                    else Data.Map.mapWithKey (\ before afters -> choose (ddiv priorWeight (dplus priorWeight (fromIntegral $ length afters))) (prior before) (equally afters)) mapAll
   in HDMTC kVal prior mapAllDist
 
-buildHarmonyDistribution :: Int -> [ChordProgression] -> HarmonyDistributionModel
-buildHarmonyDistribution kVal = buildHarmonyDistributionModelWithPrior kVal laplacianPrior 0
+buildHarmonyDistributionModel :: Int -> [ChordProgression] -> HarmonyDistributionModel
+buildHarmonyDistributionModel kVal = buildHarmonyDistributionModelWithPrior kVal laplacianPrior 0
 
 hdmChoose :: Double -> HDM -> HDM -> HDM
 hdmChoose = error "No hdm choose."
@@ -99,10 +104,12 @@ distAfter :: HDM -> ChordProgression -> Dist Chord
 distAfter (HDMTC thisK prior hdmMap) cp =
   if length cp /= thisK
   then error "bad cp length"
-  else let mapVal = Data.Map.lookup cp hdmMap 
-       in case (mapVal) of
-         Nothing -> (prior cp) -- error "did not find case." --Use prior when nothing is available.
-         Just d -> d
+  else
+    let key = cpFirstInterval cp
+        mapVal = Data.Map.lookup (transposeCpToA cp) hdmMap --Key agnosticism happens here!
+    in case (mapVal) of
+        Nothing -> (prior cp) -- error "did not find case." --Use prior when nothing is available.
+        Just d -> transpose d key --Transpose back to undo the key agnosticism
                    
 
 --Pseudoprobabilities with wildcard.  Or reserve some space for wildcard.ner
