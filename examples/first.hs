@@ -10,6 +10,7 @@ import HarmLang.Expression
 
 import HarmLang.Probability
 import HarmLang.HarmonyDistributionModel
+import HarmLang.Priors
 
 import Test.HUnit hiding (test)
 
@@ -43,7 +44,9 @@ tests = TestList [
 
                    TestLabel "HarmonyDistributionModel Tests" testHarmonyDistributionModel,
                    TestLabel "Test Inference" testInference,
-                   TestLabel "Key Agnosticism" testKeyAgnosticism
+                   TestLabel "Key Agnosticism" testKeyAgnosticism,
+                   TestLabel "Laplacian Prior" testLaplacianPrior
+
                  ]
 
 -- parse tests
@@ -223,4 +226,30 @@ testKeyAgnosticism = let
     dist = distAfter hdm query
     in
     TestCase $ assertEqual "Key agnosticism" True (all (\ (val, theProb) -> (==) theProb (probv dist val)) probs)--TODO probably a better way than assertEqual
+
+{-
+--Intractable.
+testLaplacianPrior = let
+    k = 2
+    hdm = buildHarmonyDistributionModelWithPrior k laplacianPrior 1.0 [[hl| [AM BM CM] |], [hl| [AM BM Cm] |]]
+    query = [hl| [AM BM] |]
+    dist = distAfter hdm query 
+    should = (0.5 + (1.0 / (fromIntegral numChords))) / 2.0
+    got = probv dist [hl| 'CM' |]
+    in
+    TestCase $ assertEqual ("Laplacian Prior Test: should = " ++ (show should) ++ ", got = " ++ (show got)) should got
+-}
+
+testLaplacianPrior = let
+    k = 2
+    prior = chordLimitedLaplacianPrior [map Interval [4, 7]]
+    hdm = buildHarmonyDistributionModelWithPrior k prior 2.0 [[hl| [AM BM CM] |], [hl| [AM BM Cm] |]]
+    query = [hl| [AM BM] |]
+    dist = distAfter hdm query 
+    should = (0.5 + (1.0 / 12.0)) / 2.0
+    got = probv dist [hl| 'CM' |]
+    in
+    TestCase $ assertEqual ("Laplacian Prior Test: should = " ++ (show should) ++ ", got = " ++ (show got)) should got
+
+
 
