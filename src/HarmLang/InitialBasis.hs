@@ -79,7 +79,7 @@ interpretNamedIntervalCaseInsensitive s = interpretNamedInterval $ map toLower s
 
 
 -- Take the name of a chord and convert to an interval set
-chordNameToIntervalSet :: String -> [Interval]
+chordNameToIntervalSet :: String -> ChordType
 chordNameToIntervalSet name =
   let 
     nToInts "5" = [7]

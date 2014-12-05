@@ -110,7 +110,13 @@ distAfter (HDMTC thisK prior hdmMap) cp =
     in case (mapVal) of
         Nothing -> (prior cp) -- error "did not find case." --Use prior when nothing is available.
         Just d -> transpose d key --Transpose back to undo the key agnosticism
-                   
+
+
+--Use a harmony distribution model as a prior.
+--MUST have the same k as the prior that uses it.
+hdmPrior :: HDM -> Prior
+hdmPrior hdm cp = distAfter hdm cp
+
 
 --Pseudoprobabilities with wildcard.  Or reserve some space for wildcard.ner
 --Prior on the HDM

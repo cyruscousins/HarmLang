@@ -244,10 +244,10 @@ testLaplacianPrior = let
     k = 2
     prior = chordLimitedLaplacianPrior [map Interval [4, 7]]
     hdm = buildHarmonyDistributionModelWithPrior k prior 2.0 [[hl| [AM BM CM] |], [hl| [AM BM Cm] |]]
-    query = [hl| [AM BM] |]
-    dist = distAfter hdm query 
-    should = (0.5 + (1.0 / 12.0)) / 2.0
-    got = probv dist [hl| 'CM' |]
+    queries = [ [hl| [AM BM] |], [hl| [Bbm7b5 EmMa7] |] ]
+    dists = map (distAfter hdm) queries
+    should = [(0.5 + (1.0 / 12.0)) / 2.0, 1.0 / 12.0]
+    got = map (\dist -> probv dist [hl| 'CM' |]) dists
     in
     TestCase $ assertEqual ("Laplacian Prior Test: should = " ++ (show should) ++ ", got = " ++ (show got)) should got
 
