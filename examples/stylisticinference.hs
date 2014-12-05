@@ -40,8 +40,8 @@ makeHdms :: [[ChordProgression]] -> [[ChordProgression]] -> [HarmonyDistribution
 makeHdms allData hdmData =
   let
     k = 3
-    priorPrior = chordLimitedLaplacianPriorFromDb $ concat allData
-    prior = hdmPrior $ buildHarmonyDistributionModelWithPrior k priorPrior 1.0 (concat hdmData)
+    priorPrior = chordLimitedLaplacianPriorFromDb $ concat allData -- all trans between chords in db are equally likely
+    prior = hdmPrior $ buildHarmonyDistributionModelWithPrior k priorPrior 1.0 (concat hdmData) -- HDM of all data in db
   in
     map (\thisHdmData -> buildHarmonyDistributionModelWithPrior k prior 1.0 thisHdmData) hdmData
 
