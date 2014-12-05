@@ -7,6 +7,9 @@ import HarmLang.ChordProgressionDatabase
 import HarmLang.HarmonyDistributionModel
 import HarmLang.Priors
 
+import Data.List
+import Data.Maybe
+
 mapInd :: (a -> Int -> b) -> [a] -> [b]
 mapInd f l = let
     mapIndH f [] _ = []
@@ -24,7 +27,8 @@ getTopCategories n = (take n) . reverse . sortGroupsBySize
 
 
 artists :: [String]
-artists = ["Antonio-Carlos Jobim", "Duke Ellington", "Cole Porter", "Richard Rogers"]
+--artists = ["Antonio-Carlos Jobim", "Duke Ellington", "Cole Porter", "Richard Rodgers", "George Gershwin", "Jerome Kern"]
+artists = ["Antonio-Carlos Jobim", "Duke Ellington", "George Gershwin", "Jerome Kern"]
 getTestArtists :: ChordProgressionDatabase -> [(String, [TimedChordProgression])]
 getTestArtists db = filter (\ (name, cps) -> (elem name artists)) (getByArtist db)
 
@@ -32,15 +36,14 @@ splitTrainingTest :: Int -> [[ChordProgression]] -> ([(ChordProgression, Int)], 
 splitTrainingTest tSize db = (concat $ mapInd (\ l index -> map (\ q -> (q, index)) (take tSize l)) db, map (drop tSize) db)
 
 -- build harmony distribution models, and some cool priors to boot.
-makeHdms :: [[ChordProgression]] -> [HarmonyDistributionModel]
-makeHdms hdmData =
+makeHdms :: [[ChordProgression]] -> [[ChordProgression]] -> [HarmonyDistributionModel]
+makeHdms allData hdmData =
   let
     k = 3
-    priorPrior = chordLimitedLaplacianPriorFromDb $ concat hdmData
+    priorPrior = chordLimitedLaplacianPriorFromDb $ concat allData
     prior = hdmPrior $ buildHarmonyDistributionModelWithPrior k priorPrior 1.0 (concat hdmData)
   in
-    map (\thisHdmData -> buildHarmonyDistributionModelWithPrior k priorPrior 1.0 thisHdmData) hdmData
-
+    map (\thisHdmData -> buildHarmonyDistributionModelWithPrior k prior 1.0 thisHdmData) hdmData
 
 
 -- gives the name of each category followed by a colon followed by number of
@@ -63,16 +66,16 @@ main = do
   --putStrLn $ "DB:\n" ++ (show cpd)
 
   --Has type [(String, [TimedChordProgression])]
-  --let topClasses = (getTopCategories 2) (getByArtist cpd)
+  --let topClasses = (getTopCategories 5) (getByArtist cpd)
   let topClasses = (getTestArtists cpd)
-  putStrLn $ "Top Classes: " ++ (summary topClasses)
+  putStrLn $ "Top Classes:\n" ++ (summary topClasses)
   --let hdms = map (\ (name, progs) -> buildHarmonyDistributionModel 2 (map toUntimedProgression progs)) topClasses
 
   --Has type ([(ChordProgression, Int)], [[ChordProgression]])
-  let (test, training) = splitTrainingTest 2 (map ((map toUntimedProgression) . snd) topClasses)
-  let hdms = makeHdms training
+  let (test, training) = splitTrainingTest 3 (map ((map toUntimedProgression) . snd) topClasses)
+  let hdms = makeHdms (map ((map toUntimedProgression) . snd) (getByArtist cpd)) training
   
-  putStrLn $ concat (map (\ (prog, classIndex) -> "Class " ++ (show classIndex) ++ ", probs " ++ (show $ inferStyle hdms prog) ++ "\n") test )
+  putStrLn $ concat (map (\ (prog, classIndex) -> "Class " ++ (show classIndex) ++ ", " ++ ("rank " ++ (show $ getRank (inferStyle hdms prog) classIndex)) ++ ", " ++ (show $ inferStyle hdms prog) ++ "\n") test )
   --putStrLn $ "Prob 1: " ++ (show $ inferStyle [hdms !! 0] (toUntimedProgression $ (head . snd . head) topClasses))
   --putStrLn $ "Prob 1: " ++ (show $ inferStyle [hdms !! 1] (toUntimedProgression $ (head . snd . head) topClasses))
   --putStrLn $ "Probs of first prog: " ++ (show $ inferStyle hdms (toUntimedProgression $ (head . snd . head) topClasses))
@@ -86,3 +89,23 @@ main = do
 
 
 --TODO robustness testing.
+
+--http://stackoverflow.com/questions/9270478/efficiently-find-indices-of-maxima-of-a-list
+indexOfMaximum :: (Ord n, Num n) => [n] -> Int
+indexOfMaximum list =
+   let indexOfMaximum' :: (Ord n, Num n) => [n] -> Int -> n -> Int -> Int
+       indexOfMaximum' list' currIndex highestVal highestIndex
+          | null list'                = highestIndex
+          | (head list') > highestVal = 
+               indexOfMaximum' (tail list') (1 + currIndex) (head list') currIndex
+          | otherwise                 = 
+               indexOfMaximum' (tail list') (1 + currIndex) highestVal highestIndex
+   in indexOfMaximum' list 0 0 0
+
+indexOfMinimum :: (Ord n, Num n) => [n] -> Int
+indexOfMinimum list = indexOfMaximum (map (\a -> 0 - a) list)
+
+
+getRank :: (Ord n, Num n) => [n] -> Int -> Int
+getRank l i = fromJust $ Data.List.elemIndex (l !! i) (reverse $ Data.List.sort l)
+
