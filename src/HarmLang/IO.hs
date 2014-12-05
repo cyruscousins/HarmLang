@@ -3,6 +3,7 @@
 
 module HarmLang.IO where
 
+import HarmLang.InitialBasis
 import HarmLang.Types
 import Codec.Midi
 

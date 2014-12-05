@@ -7,15 +7,20 @@ import HarmLang.ChordProgressionDatabase
 import HarmLang.HarmonyDistributionModel
 import HarmLang.Priors
 
+-- groups progressions in a CPD by artist, denoting the artist with a string
 getByArtist :: ChordProgressionDatabase -> [(String, [TimedChordProgression])]
 getByArtist cpd = (getProgressionsCategorizedByCriterion cpd "Artist") 
 
+-- extracts from a list of categories the n with the most progressions
 getTopCategories :: Int -> [(String, [TimedChordProgression])] -> [(String, [TimedChordProgression])]
-getTopCategories count = (take count) . reverse . sortGroupsBySize
+getTopCategories n = (take n) . reverse . sortGroupsBySize
 
+-- gives the name of each category followed by a colon followed by number of
+-- progressions in that category. each entry separated by newline.
 summary :: [(String, [TimedChordProgression])] -> String
 summary ([]) = ""
-summary (item:more) = (fst item) ++ ": " ++ (show $ (length . snd) item) ++ "\n" ++ (summary more)
+summary ((s,l):rest) =  s ++ ": " ++ (show $ length l) ++ "\n" ++ (summary rest)
+--summary (item:more) = (fst item) ++ ": " ++ (show $ (length . snd) item) ++ "\n" ++ (summary more)
 
 probsToStr :: [Double] -> String
 probsToStr [] = ""
