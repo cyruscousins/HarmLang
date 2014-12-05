@@ -110,6 +110,10 @@ chordNameToIntervalSet name =
     nToInts "6" = [4,7,9]
     nToInts "m6" = [3,7,9]
     nToInts "7b9" = [1,4,7,10]
+    nToInts "sus4" = [5,7]
+    nToInts "sus2" = [2,7]
+    nToInts "7sus4" = [5,7,10]
+    nToInts "7sus2" = [2,7,10]
     nToInts _ = error "Invalid chord name."
   in map Interval $ nToInts name
   
