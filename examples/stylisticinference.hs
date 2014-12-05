@@ -23,6 +23,10 @@ getTopCategories :: Int -> [(String, [TimedChordProgression])] -> [(String, [Tim
 getTopCategories n = (take n) . reverse . sortGroupsBySize
 
 
+artists :: [String]
+artists = ["Antonio-Carlos Jobim", "Duke Ellington", "Cole Porter", "Richard Rogers"]
+getTestArtists :: ChordProgressionDatabase -> [(String, [TimedChordProgression])]
+getTestArtists db = filter (\ (name, cps) -> (elem name artists)) (getByArtist db)
 
 splitTrainingTest :: Int -> [[ChordProgression]] -> ([(ChordProgression, Int)], [[ChordProgression]])
 splitTrainingTest tSize db = (concat $ mapInd (\ l index -> map (\ q -> (q, index)) (take tSize l)) db, map (drop tSize) db)
@@ -56,10 +60,11 @@ probsToStr (a:b) = (show a) ++ ", " ++ (probsToStr b)
 main :: IO ()
 main = do
   cpd <- loadChordProgressionDatabase "./res/progressions.txt"
-  putStrLn $ "DB:\n" ++ (show cpd)
+  --putStrLn $ "DB:\n" ++ (show cpd)
 
   --Has type [(String, [TimedChordProgression])]
-  let topClasses = (getTopCategories 2) (getByArtist cpd)
+  --let topClasses = (getTopCategories 2) (getByArtist cpd)
+  let topClasses = (getTestArtists cpd)
   putStrLn $ "Top Classes: " ++ (summary topClasses)
   --let hdms = map (\ (name, progs) -> buildHarmonyDistributionModel 2 (map toUntimedProgression progs)) topClasses
 
