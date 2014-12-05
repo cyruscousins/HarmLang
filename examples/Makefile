@@ -28,7 +28,7 @@ melody: melody.hs
 	$(HC) $(DEPS) melody.hs
 
 stylisticinference: stylisticinference.hs
-	$(HC) $(DEPSNOIO) stylisticinference.hs
+	$(HC) $(DEPSNOIO) stylisticinference.hs -o stylisticinference
 
 remove_object_files:
 	rm *.o *.hi *.dyn*

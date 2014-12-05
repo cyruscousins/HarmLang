@@ -1,4 +1,4 @@
-module Examples.StylisticInference where
+--module Examples.StylisticInference where
 
 import HarmLang.Types
 import HarmLang.InitialBasis
@@ -62,7 +62,9 @@ probsToStr (a:b) = (show a) ++ ", " ++ (probsToStr b)
 
 main :: IO ()
 main = do
-  cpd <- loadChordProgressionDatabase "./res/progressions.txt"
+  putStrLn "Please enter the path to the database."
+  path <- getLine
+  cpd <- loadChordProgressionDatabase (if path == "" then "./res/progressions.txt" else path)
   --putStrLn $ "DB:\n" ++ (show cpd)
 
   --Has type [(String, [TimedChordProgression])]
