@@ -1,9 +1,13 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverlappingInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module HarmLang.HarmonyDistributionModel
 where
 
 import HarmLang.Types
 import HarmLang.InitialBasis
+import HarmLang.Priors
 
 import HarmLang.Probability
 
@@ -11,9 +15,11 @@ import qualified Data.Map
 
 --DIST:
 
-type ChordDistribution = (Dist Chord)
-
 type Probability = Double
+
+instance Transposable ChordDistribution where
+  transpose (Dist list) interval = Dist $ map (\ (chord, prob) -> (transpose chord interval, prob)) list
+
 
 --In a HDM, chords are ordered (to use the map)
 
@@ -44,25 +50,46 @@ sliceKmersWithLastSplit i cp = map splitLast $ sliceKmers (i + 1) cp
 k :: Int
 k = 3
 
-
-type Prior = (ChordProgression -> ChordDistribution)
-
 data HarmonyDistributionModel = HDMTC Int Prior (Data.Map.Map ChordProgression ChordDistribution)
 
 --type HarmDistModel HarmonyDistributionModel
 
 type HDM = HarmonyDistributionModel
 
-buildHarmonyDistributionModel :: Int -> [ChordProgression] -> HarmonyDistributionModel
-buildHarmonyDistributionModel kVal cpArr = --TODO actually apply the PRIOR!
+--5 very silly helper functions
+
+cpFirstInterval :: ChordProgression -> Interval
+cpFirstInterval cp@((Harmony (PitchClass p) _):_) = Interval p
+cpFirstIntreval _ = Interval 0
+
+transposeCpToA :: ChordProgression -> ChordProgression
+transposeCpToA cp = transpose cp (inverse (cpFirstInterval cp))
+
+transposeToA :: (ChordProgression, Chord) -> (ChordProgression, Chord)
+transposeToA (cp, chord) = (transpose cp (inverse (cpFirstInterval cp)), transpose chord (inverse (cpFirstInterval cp)))
+
+dplus :: Double -> Double -> Double
+dplus = (+)
+
+ddiv :: Double -> Double -> Double
+ddiv = (/)
+
+--Function used to build a harmony distribution model
+buildHarmonyDistributionModelWithPrior :: Int -> Prior -> Double -> [ChordProgression] -> HarmonyDistributionModel
+buildHarmonyDistributionModelWithPrior kVal prior priorWeight cpArr =
   let listVals = concat (map (sliceKmersWithLastSplit kVal) cpArr)
-  --let listVals = foldr (++) [] (map (\ cp -> (map (\ kmer -> (take kVal kmer, last kmer) (sliceKmers (kVal + 1))  ))) cpArr) --TODO this is slow.
-      listValLists = map (\ (key, val) -> (key, [val])) listVals
+      --Greatest Hack of all time.  Transpose everything to starting on an A.
+      listValsTransposed = map transposeToA listVals --This is where Key Agnosticism occurs
+      listValLists = map (\ (key, val) -> (key, [val])) listValsTransposed
       mapAll = Data.Map.fromListWith (++) listValLists
       --mapAllSorted = map List.sort mapAll
-      mapAllDist = Data.Map.map equally mapAll
-  in HDMTC kVal (\ _ -> equally allChords) mapAllDist --TODO laplacian prior is baked in here.
-    
+      mapAllDist = if priorWeight == 0
+                   then Data.Map.map equally mapAll
+                   else Data.Map.mapWithKey (\ before afters -> choose (ddiv priorWeight (dplus priorWeight (fromIntegral $ length afters))) (prior before) (equally afters)) mapAll
+  in HDMTC kVal prior mapAllDist
+
+buildHarmonyDistributionModel :: Int -> [ChordProgression] -> HarmonyDistributionModel
+buildHarmonyDistributionModel kVal = buildHarmonyDistributionModelWithPrior kVal laplacianPrior 0
 
 hdmChoose :: Double -> HDM -> HDM -> HDM
 hdmChoose = error "No hdm choose."
@@ -77,11 +104,19 @@ distAfter :: HDM -> ChordProgression -> Dist Chord
 distAfter (HDMTC thisK prior hdmMap) cp =
   if length cp /= thisK
   then error "bad cp length"
-  else let mapVal = Data.Map.lookup cp hdmMap 
-       in case (mapVal) of
-         Nothing -> (prior cp) -- error "did not find case." --Use prior when nothing is available.
-         Just d -> d
-                   
+  else
+    let key = cpFirstInterval cp
+        mapVal = Data.Map.lookup (transposeCpToA cp) hdmMap --Key agnosticism happens here!
+    in case (mapVal) of
+        Nothing -> (prior cp) -- error "did not find case." --Use prior when nothing is available.
+        Just d -> transpose d key --Transpose back to undo the key agnosticism
+
+
+--Use a harmony distribution model as a prior.
+--MUST have the same k as the prior that uses it.
+hdmPrior :: HDM -> Prior
+hdmPrior hdm cp = distAfter hdm cp
+
 
 --Pseudoprobabilities with wildcard.  Or reserve some space for wildcard.ner
 --Prior on the HDM

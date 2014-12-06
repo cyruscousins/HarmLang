@@ -79,7 +79,7 @@ interpretNamedIntervalCaseInsensitive s = interpretNamedInterval $ map toLower s
 
 
 -- Take the name of a chord and convert to an interval set
-chordNameToIntervalSet :: String -> [Interval]
+chordNameToIntervalSet :: String -> ChordType
 chordNameToIntervalSet name =
   let 
     nToInts "5" = [7]
@@ -103,10 +103,17 @@ chordNameToIntervalSet name =
     nToInts "b9" = [1,4,7,10]
     nToInts "#9" = [3,4,7,10]
     nToInts "Ma9" = [2,4,7,11] 
-    nToInts "m11" = [2,3,5,7,10]
+    nToInts "m11" = [3,5,7,10]
     nToInts "7b6" = [4,7,8,10]
     nToInts "13" = [2,4,7,9,10]
     nToInts "Ma13" = [2,4,7,9,11]
+    nToInts "6" = [4,7,9]
+    nToInts "m6" = [3,7,9]
+    nToInts "7b9" = [1,4,7,10]
+    nToInts "sus4" = [5,7]
+    nToInts "sus2" = [2,7]
+    nToInts "7sus4" = [5,7,10]
+    nToInts "7sus2" = [2,7,10]
     nToInts _ = error "Invalid chord name."
   in map Interval $ nToInts name
   
@@ -258,6 +265,9 @@ chordInversions chord@(Harmony pc ints) =
     map (\l -> toChord (head l) (tail l)) allNoteRotations
 chordInversions other = [other]
 
+--Are the provided chords inversions of one another?
+isInversion :: Chord -> Chord -> Bool
+isInversion c1 c2 = elem c2 (chordInversions c1)
 
 
 

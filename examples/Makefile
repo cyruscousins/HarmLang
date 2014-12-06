@@ -1,4 +1,4 @@
-CC=ghc
+HC=ghc
 DEPSNOIO=../src/HarmLang/Types.hs  \
 	 ../src/HarmLang/Parser.hs  \
 	 ../src/HarmLang/Interpreter.hs  \
@@ -8,33 +8,30 @@ DEPSNOIO=../src/HarmLang/Types.hs  \
 	 ../src/HarmLang/InitialBasis.hs \
 	 ../src/HarmLang/Probability.hs \
 	 ../src/HarmLang/HarmonyDistributionModel.hs \
-	 ../src/HarmLang/ChordProgressionDatabase.hs
+	 ../src/HarmLang/ChordProgressionDatabase.hs \
+	 ../src/HarmLang/Priors.hs
 DEPS=$(DEPSNOIO)  \
 	 ../src/HarmLang/IO.hs
 
-all: cycle blues melody stylisticinference remove_object_files 
-	 ../src/HarmLang/ChordProgressionDatabase.hs \
-	 ../src/HarmLang/IO.hs
-
-all: cycle blues melody arpeggiatesong remove_object_files 
+all: arpeggiatesong blues cycle melody stylisticinference remove_object_files
 
 arpeggiatesong: arpeggiatesong.hs
-	$(CC) $(DEPS) arpeggiatesong.hs
+	$(HC) $(DEPS) arpeggiatesong.hs
 
 blues: bluesmachine.hs
-	$(CC) $(DEPS) bluesmachine.hs
+	$(HC) $(DEPS) bluesmachine.hs
 
 cycle: cycle.hs
-	$(CC) $(DEPS) cycle.hs
+	$(HC) $(DEPS) cycle.hs
 
 melody: melody.hs
-	$(CC) $(DEPS) melody.hs
+	$(HC) $(DEPS) melody.hs
 
 stylisticinference: stylisticinference.hs
-	$(CC) $(DEPSNOIO) stylisticinference.hs
+	$(HC) $(DEPSNOIO) stylisticinference.hs -o stylisticinference
 
 remove_object_files:
 	rm *.o *.hi *.dyn*
 
 clean:
-	rm -f cycle bluesmachine melody arpeggiatesong
+	rm -f arpeggiatesong blues cycle melody stylisticinference

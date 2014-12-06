@@ -10,6 +10,7 @@ import HarmLang.Expression
 
 import HarmLang.Probability
 import HarmLang.HarmonyDistributionModel
+import HarmLang.Priors
 
 import Test.HUnit hiding (test)
 
@@ -42,7 +43,11 @@ tests = TestList [
                    TestLabel "Test Chord Enum 4" testChordEnum4,
 
                    TestLabel "HarmonyDistributionModel Tests" testHarmonyDistributionModel,
-                   TestLabel "Test Inference" testHarmonyDistributionModel]
+                   TestLabel "Test Inference" testInference,
+                   TestLabel "Key Agnosticism" testKeyAgnosticism,
+                   TestLabel "Laplacian Prior" testLaplacianPrior
+
+                 ]
 
 -- parse tests
 testNote = let
@@ -202,13 +207,49 @@ testHarmonyDistributionModel = let
 
 --Inference problem
 testInference = let
-    k = 2
-    hdm1 = buildHarmonyDistributionModel k [[hl|[CM EM Am7 Dm7 G7 CM7]|], [hl|[CM EM Am7 D7 D#o7 CM7]|], [hl|[Dm7 G7 A7]|]]
-    hdm2 = buildHarmonyDistributionModel k [[hl|[CM EM Am7 Dm7 G7 CM7]|], [hl|[FMa7 F#o7 Gm7 C7 Am7 Dm7 Gm7 C7]|], [hl|[FMa7 F#o7 Gm7 C7 Am7 Dm7 Cm7 F7]|], [hl|[BbMa7 Abm7 Db7 GbMa7 Em7 A7 DMa7 Abm7 Db7 GbMa7 Gm7 C7]|], [hl|[FMa7 F#o7 Gm7 C7 Bb7 Am7 D7 Gm7 C7 FMa7 Gm7 C7]|]]
+    k = 3
+    hdm1 = buildHarmonyDistributionModel k [[hl|[FM7 CM EM Am7 Dm7 G7 CM7]|], [hl|[FM7 CM EM Am7 D7 D#o7 CM7]|], [hl|[EbM7 Dm7 G7 A7]|]]
+    hdm2 = buildHarmonyDistributionModel k [[hl|[FM7 CM EM Am7 Dm7 G7 CM7]|], [hl|[E7 FMa7 F#o7 Gm7 C7 Am7 Dm7 Gm7 C7]|], [hl|[E7 FMa7 F#o7 Gm7 C7 Am7 Dm7 Cm7 F7]|], [hl|[F7 BbMa7 Abm7 Db7 GbMa7 Em7 A7 DMa7 Abm7 Db7 GbMa7 Gm7 C7]|], [hl|[E7 FMa7 F#o7 Gm7 C7 Bb7 Am7 D7 Gm7 C7 FMa7 Gm7 C7]|]]
     prog = [hl|[CM EM Am7 Dm7 G7 CM7]|]
+--    prog = [hl|[CM EM Am7 Dm7]|]
     got = inferStyle [hdm1, hdm2] prog
-    should = [0.25, 1]
+    should = [0.5, 1]
     in
-    TestCase $ assertEqual "Harmony Distribution Model" should got
+    TestCase $ assertEqual "Inference test" should got
+
+--Key Agnosticism
+testKeyAgnosticism = let
+    k = 2
+    hdm = buildHarmonyDistributionModel k [[hl| [AM BM CM] |], [hl| [A#M B#M C#M] |], [hl| [BM C#M Dm] |]]
+    query = [hl| [BM C#M] |]
+    probs = [([hl| 'DM' |], 2.0 / 3.0), ([hl| 'Dm' |], 1.0 / 3.0) ]
+    dist = distAfter hdm query
+    in
+    TestCase $ assertEqual "Key agnosticism" True (all (\ (val, theProb) -> (==) theProb (probv dist val)) probs)--TODO probably a better way than assertEqual
+
+{-
+--Intractable.
+testLaplacianPrior = let
+    k = 2
+    hdm = buildHarmonyDistributionModelWithPrior k laplacianPrior 1.0 [[hl| [AM BM CM] |], [hl| [AM BM Cm] |]]
+    query = [hl| [AM BM] |]
+    dist = distAfter hdm query 
+    should = (0.5 + (1.0 / (fromIntegral numChords))) / 2.0
+    got = probv dist [hl| 'CM' |]
+    in
+    TestCase $ assertEqual ("Laplacian Prior Test: should = " ++ (show should) ++ ", got = " ++ (show got)) should got
+-}
+
+testLaplacianPrior = let
+    k = 2
+    prior = chordLimitedLaplacianPrior [map Interval [4, 7]]
+    hdm = buildHarmonyDistributionModelWithPrior k prior 2.0 [[hl| [AM BM CM] |], [hl| [AM BM Cm] |]]
+    queries = [ [hl| [AM BM] |], [hl| [Bbm7b5 EmMa7] |] ]
+    dists = map (distAfter hdm) queries
+    should = [(0.5 + (1.0 / 12.0)) / 2.0, 1.0 / 12.0]
+    got = map (\dist -> probv dist [hl| 'CM' |]) dists
+    in
+    TestCase $ assertEqual ("Laplacian Prior Test: should = " ++ (show should) ++ ", got = " ++ (show got)) should got
+
 
 
