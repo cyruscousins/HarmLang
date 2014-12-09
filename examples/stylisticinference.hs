@@ -10,13 +10,6 @@ import HarmLang.Priors
 import Data.List
 import Data.Maybe
 
-mapInd :: (a -> Int -> b) -> [a] -> [b]
-mapInd f l = let
-    mapIndH f [] _ = []
-    mapIndH f (a:as) i = (f a i):(mapIndH f as ((+) i 1))
-  in
-    mapIndH f l 0
-
 -- groups progressions in a CPD by artist, denoting the artist with a string
 getByArtist :: ChordProgressionDatabase -> [(String, [TimedChordProgression])]
 getByArtist cpd = (getProgressionsCategorizedByCriterion cpd "Artist") 
@@ -78,35 +71,8 @@ main = do
   let hdms = makeHdms (map ((map toUntimedProgression) . snd) (getByArtist cpd)) training
   
   putStrLn $ concat (map (\ (prog, classIndex) -> "Class " ++ (show classIndex) ++ ", " ++ ("rank " ++ (show $ getRank (inferStyle hdms prog) classIndex)) ++ ", " ++ (show $ inferStyle hdms prog) ++ "\n") test )
-  --putStrLn $ "Prob 1: " ++ (show $ inferStyle [hdms !! 0] (toUntimedProgression $ (head . snd . head) topClasses))
-  --putStrLn $ "Prob 1: " ++ (show $ inferStyle [hdms !! 1] (toUntimedProgression $ (head . snd . head) topClasses))
-  --putStrLn $ "Probs of first prog: " ++ (show $ inferStyle hdms (toUntimedProgression $ (head . snd . head) topClasses))
-  --putStrLn $ "Probs of second prog: " ++ (show $ inferStyle hdms (toUntimedProgression $ (head . snd . (flip (!!)) 1) topClasses))
-  --putStrLn $ "Probs of third prog: " ++ (show $ inferStyle hdms (toUntimedProgression $ (head . snd . (flip (!!)) 2) topClasses))
-  --putStrLn $ "Probs of fourth prog: " ++ (show $ inferStyle hdms (toUntimedProgression $ (head . snd . (flip (!!)) 3) topClasses))
-  
-
-  --TODO probProgGivenModel does not always work.  What to do for when something isn't found???
-  --TODO cheating, don't use training data!
-
 
 --TODO robustness testing.
-
---http://stackoverflow.com/questions/9270478/efficiently-find-indices-of-maxima-of-a-list
-indexOfMaximum :: (Ord n, Num n) => [n] -> Int
-indexOfMaximum list =
-   let indexOfMaximum' :: (Ord n, Num n) => [n] -> Int -> n -> Int -> Int
-       indexOfMaximum' list' currIndex highestVal highestIndex
-          | null list'                = highestIndex
-          | (head list') > highestVal = 
-               indexOfMaximum' (tail list') (1 + currIndex) (head list') currIndex
-          | otherwise                 = 
-               indexOfMaximum' (tail list') (1 + currIndex) highestVal highestIndex
-   in indexOfMaximum' list 0 0 0
-
-indexOfMinimum :: (Ord n, Num n) => [n] -> Int
-indexOfMinimum list = indexOfMaximum (map (\a -> 0 - a) list)
-
 
 getRank :: (Ord n, Num n) => [n] -> Int -> Int
 getRank l i = fromJust $ Data.List.elemIndex (l !! i) (reverse $ Data.List.sort l)

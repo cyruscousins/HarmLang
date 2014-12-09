@@ -48,6 +48,8 @@ instance MIDIable TimedChordProgression where
 
     outputToMidi prog file = writeMidi [(makeTrack prog)] file
 
+    --TODO this creates a tempo change for every chord.  Why?
+    --TODO breaks on Other chords.
 
 writeMidi :: [Track Ticks] -> FilePath -> IO ()
 writeMidi tracks file = 

@@ -47,11 +47,18 @@ data Octave = Octave Int
   deriving (Eq, Ord, Data, Typeable)
 
 instance Show Octave where
-  show (Octave oct) = show oct
+  show (Octave o) = show o
+
+instance Enum Octave where
+  toEnum = Octave
+  fromEnum (Octave o) = o
 
 -- A pitchclass and an octave.
 data Pitch = Pitch PitchClass Octave
   deriving (Eq, Data, Typeable)
+
+instance Ord Pitch where
+  (<=) (Pitch (PitchClass pc1) (Octave oct1)) (Pitch (PitchClass pc2) (Octave oct2)) = (Prelude.<=) (pc1 + (oct1 * 12)) (pc2 + (oct2 * 12))
 
 instance Show Pitch where
   show (Pitch pc oct) = (show pc) ++ "@" ++ (show oct)

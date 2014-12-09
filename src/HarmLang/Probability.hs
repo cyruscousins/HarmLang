@@ -24,11 +24,17 @@ import Data.Function
 -- distribution with finite support.
 -- invariants: each value of type a is unique in the list
 -- and sum (snd (unzip list)) == 1.0
-data Dist a = Dist [(a, Double)] deriving (Eq, Show)
+data Dist a = Dist [(a, Double)] deriving (Show)
+
+instance Eq a => Eq (Dist a) where
+  (==) d1 d2 = (Prelude.==) (likelylist d1) (likelylist d2)
 
 --------------------
 --- CONSTRUCTORS ---
 --------------------
+
+certainly :: (Eq a) => a -> Dist a
+certainly a = Dist [(a, 1.0)]
 
 equally :: (Eq a) => [a] -> Dist a 
 equally as = Dist $ regroup (zip as (repeat (1.0/(fromIntegral (length as)))))

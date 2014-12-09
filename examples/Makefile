@@ -30,6 +30,9 @@ melody: melody.hs
 stylisticinference: stylisticinference.hs
 	$(HC) $(DEPSNOIO) stylisticinference.hs -o stylisticinference
 
+demo: demo.hs
+	$(HC) $(DEPSNOIO) demo.hs -o demo
+
 remove_object_files:
 	rm *.o *.hi *.dyn*
 

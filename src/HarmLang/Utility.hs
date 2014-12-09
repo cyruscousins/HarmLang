@@ -31,3 +31,25 @@ powerset [] = [[]]
 powerset (x:xs) = xss ++ map (x:) xss
                   where xss = powerset xs
 
+--map with indices
+mapInd :: (a -> Int -> b) -> [a] -> [b]
+mapInd f l = let
+    mapIndH f [] _ = []
+    mapIndH f (a:as) i = (f a i):(mapIndH f as ((+) i 1))
+  in
+    mapIndH f l 0
+
+--http://stackoverflow.com/questions/9270478/efficiently-find-indices-of-maxima-of-a-list
+indexOfMaximum :: (Ord n, Num n) => [n] -> Int
+indexOfMaximum list =
+   let indexOfMaximum' :: (Ord n, Num n) => [n] -> Int -> n -> Int -> Int
+       indexOfMaximum' list' currIndex highestVal highestIndex
+          | null list'                = highestIndex
+          | (head list') > highestVal = 
+               indexOfMaximum' (tail list') (1 + currIndex) (head list') currIndex
+          | otherwise                 = 
+               indexOfMaximum' (tail list') (1 + currIndex) highestVal highestIndex
+   in indexOfMaximum' list 0 0 0
+
+indexOfMinimum :: (Ord n, Num n) => [n] -> Int
+indexOfMinimum list = indexOfMaximum (map (\a -> 0 - a) list)
