@@ -1,4 +1,4 @@
---module Examples.StylisticInference where
+module Examples.StylisticInference where
 
 import HarmLang.Types
 import HarmLang.InitialBasis
@@ -6,6 +6,7 @@ import HarmLang.InitialBasis
 import HarmLang.ChordProgressionDatabase
 import HarmLang.HarmonyDistributionModel
 import HarmLang.Priors
+import HarmLang.Utility
 
 import Data.List
 import Data.Maybe
@@ -55,7 +56,7 @@ probsToStr (a:b) = (show a) ++ ", " ++ (probsToStr b)
 
 main :: IO ()
 main = do
-  putStrLn "Please enter the path to the database."
+  putStrLn "Please enter the path to the database, or a newline for the default."
   path <- getLine
   cpd <- loadChordProgressionDatabase (if path == "" then "./res/progressions.txt" else path)
   --putStrLn $ "DB:\n" ++ (show cpd)
