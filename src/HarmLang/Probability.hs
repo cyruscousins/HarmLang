@@ -88,8 +88,10 @@ jointdep as f =
 joint :: (Eq a, Eq b) => Dist a -> Dist b -> Dist (a, b)
 joint (Dist as) (Dist bs) = Dist [ ((a, b), pa * pb) | (a, pa) <- as, (b, pb) <- bs]
 
-bindx :: (Eq a, Eq b) => Dist a -> (a -> Dist b) -> Dist b
-bindx dist f = resolve $ pmap f dist
+bind :: (Eq a, Eq b) => Dist a -> (a -> Dist b) -> Dist b
+bind dist f = resolve $ pmap f dist
+
+--bindx :: (Eq a, Eq b) => Dist a -> (a -> Dist b) -> Dist (a,b)
 
 -----------------
 --- OBSERVERS ---
