@@ -1,6 +1,6 @@
 harmlang
 ========
-By Cyrus Cousins and Louis Rassaby
+By Cyrus Cousins, Louis Rassaby, and Caleb Malchik
 ---
 A language for music notation, transposition, and probabalistic generation.
 

@@ -16,7 +16,7 @@
 
 \title{HarmLang Grammar}
 \author{Cyrus Cousins and Louis Rassaby}
-\date{October 29 2014}
+\date{December 8 2014}
 
 \begin{document}
 
@@ -42,8 +42,6 @@ In our grammar, we attempted to conform to the ISO 14977 standard for the Extend
 \section{Grammar}
 \subsection{Text Primitives}
 
-%See "http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form" for an explanation on EBNF.  The standard detailed there is different from that used by KF, but she cleared the use of the standard.
-
 \begin{grammar}
 
 <whitespacechar> = "\" \"" | "\"\\t\"" ;
@@ -51,10 +49,6 @@ In our grammar, we attempted to conform to the ISO 14977 standard for the Extend
 <whitespace> = <whitespacechar>, \{<whitespacechar>\} ;
 
 <optionalwhitespace> = \{<whitespacechar>\} ;
-
-%<digitnzero> = "\"1\"" | "\"2\"" | "\"3\"" | "\"4\"" | "\"5\"" | "\"6\"" | "\"7\"" | "\"8\"" | "\"9\"" ;
-
-%<digit> = "\"0\"" | <digitnzero> ;
 
 <digit> = "\"0\"" | "\"1\"" | "\"2\"" | "\"3\"" | "\"4\"" | "\"5\"" | "\"6\"" | "\"7\"" | "\"8\"" | "\"9\"" ;
 
@@ -73,9 +67,9 @@ The following are types that have special syntax for literal values in HarmLang,
 
 \begin{grammar}
 
-<int> = ("\"-\""), <digit>, \{<digit>\} ;
-
 <uint> = <digit>, \{<digit>\} ;
+
+<int> = ["\"-\""], <uint> ;
 
 %<string> = "``", {<alphanumeric>}, "''" ;
 
@@ -105,12 +99,12 @@ The following are types that have special syntax for literal values in HarmLang,
 
 <pitch> = <pitchclass>, "\"@\"", <int> ;
 
-<timeunit> = <int>, "\"/\"", <uint> | <uint> ;
+<timeunit> = <uint>, "\"/\"", <uint> | <uint> ;
 
 %<note> = (<pitch> | <rest>) | <timeunit> ; %Rest was out of scope for the assignment.
-<note> = <pitch> <timeunit> ;
+<note> = <pitch>, "\":\"", <timeunit> ;
 
-<numinterval> = <int> ;
+%<numinterval> = <int> ;
 
 %<namedinterval> = "\"0th\"" | "\"U\"" | "\"unison\"" | "\"m2nd\"" | "\"-2nd\"" | "\"minorsecond\"" | "\"2nd\"" | "\"second\"" | "\"m3rd\"" | "\"-3rd\"" | "\"minorthird\"" | "\"3rd\"" | "\"third\"" | "\"4th\"" | "\"fourth\"" | "\"+4th\"" | "\"#4th\"" | "\"augmentedfourth\"" | "\"-5th\"" | "\"d5th\"" | "\"o5th\"" | "\"b5th\"" | "\"diminishedfifth\"" | "\"tritone\"" | "\"5th\"" | "\"fifth\"" | "\"+5th\"" | "\"augmentedfifth\"" | "\"m6th\"" | "\"-6th\"" | "\"minorsixth\"" | "\"6th\"" | "\"sixth\"" | "7th" | "\"d7th\"" | "\"dom7th\"" | "\"b7th\"" | "\"seventh\"" | "\"minorseventh\"" | "\"dominantseventh\"" | "\"ma7th\"" | "\"majorseventh\"" | "\"octave\"" ;
 
@@ -121,7 +115,7 @@ The following are types that have special syntax for literal values in HarmLang,
 
 %TODO named intervals are temporarily out of order.  I have no idea why.
 %<interval> = <numinterval> | <namedinterval> ;
-<interval> = <numinterval> ;
+<interval> = <int> ;
 
 <rest> = "\"\_\"" | "\"REST\"" | "\"SILENCE\"" ;
 
@@ -133,8 +127,8 @@ The following are types that have special syntax for literal values in HarmLang,
 
 <namedchord> = "\"5\"" | "\"M\"" | "\"m\"" | "\"b5\"" | "\"dim\"" | "\"o\"" | "\"7\"" | "\"Ma7\"" | "\"m7\"" | "\"mMa7\"" | "\"m7b5\"" | "\"dim7\"" | "\"o7\"" | "\"9\"" | "\"b9\"" | "\"#9\"" | "\"Ma9\"" | "\"m11\"" | "\"7b6\"" | "\"13\"" | "\"Ma13\"" ;
 
-<chord> = <pitchclass>, "\"[\"", \{<interval>, "\" \""\}, "\"]\"" \\
-        | <pitchclass>, "\"[\"", \{<pitchclass>, "\" \""\}, "\"]\"" \\
+<chord> = <pitchclass>, ("\"[]\"" | "\"[\"", \{<interval>, <whitespace>\}, <interval>, "\"]\"") \\
+        | <pitchclass>, ("\"[]\"" | "\"[\"", \{<pitchclass>, <whitespace>\}, <pitchclass>, "\"]\"") \\
         | <pitchclass>, <namedchord> \\
         | <specialharmony> ;
 
@@ -143,7 +137,8 @@ The following are types that have special syntax for literal values in HarmLang,
 <parsabletype> = <interval> |<pitchclass> | <pitch> | <note> | <chord> | <timedchord> ;
 
 <singleton> = <optionalwhitespace>, "\"'\"", <parseabletype>, "\"'\"", <optionalwhitespace> ;
-<progression> = <optionalwhitespace>, "\"[\"", <parseabletype>, "\"'\"", <optionalwhitespace> ;
+
+<progression> = <optionalwhitespace>, ("\"[]\"" | "\"[\"", \{<parseabletype>, <whitespace>\}, <parseabletype>, "\"]\""), <optionalwhitespace> ;
 
 %<chordprogression> = \{<chord>, <whitespace>\} ;
 

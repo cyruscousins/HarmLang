@@ -1,6 +1,5 @@
 {-# LANGUAGE  QuasiQuotes #-}
 
-import HarmLang.Interpreter
 import HarmLang.Types
 import HarmLang.InitialBasis
 import HarmLang.QuasiQuoter
