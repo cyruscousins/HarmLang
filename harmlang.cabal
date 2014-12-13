@@ -12,7 +12,7 @@ license:             MIT
 license-file:        LICENSE
 
 -- The package author(s).
-author:              Louis Rassaby, Cyrus Cousins
+author:              Louis Rassaby, Cyrus Cousins, Caleb Malchik
 
 -- An email address to which users can send suggestions, bug reports, and 
 -- patches.
@@ -28,7 +28,7 @@ cabal-version:       >=1.10
 
 library
   -- Modules exported by the library.
-  exposed-modules:   HarmLang.Interpreter, HarmLang.Parser, HarmLang.Types, HarmLang.InitialBasis, HarmLang.Expression, HarmLang.QuasiQuoter HarmLang.Probability, HarmLang.HarmonyDistributionModel, HarmLang.ChordProgressionDatabase
+  exposed-modules:   HarmLang.Interpreter, HarmLang.Parser, HarmLang.Types, HarmLang.InitialBasis, HarmLang.Expression, HarmLang.QuasiQuoter HarmLang.Probability, HarmLang.HarmonyDistributionModel, HarmLang.ChordProgressionDatabase, HarmLang.ConditionalProbability
 --  exposed-modules:   HarmLang.Interpreter, HarmLang.Parser, HarmLang.Types, HarmLang.InitialBasis, HarmLang.Expression, HarmLang.QuasiQuoter HarmLang.Probability HarmLang.HarmonyDistributionModel, HarmLang.ChordProgressionDatabase, HarmLang.Priors, HarmLang.IO
   
   -- Modules included in this library but not exported.
