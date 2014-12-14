@@ -1,4 +1,4 @@
---module Examples.StylisticInference where
+module Examples.StylisticInference where
 
 import HarmLang.Types
 import HarmLang.InitialBasis
@@ -6,6 +6,7 @@ import HarmLang.InitialBasis
 import HarmLang.ChordProgressionDatabase
 import HarmLang.HarmonyDistributionModel
 import HarmLang.Priors
+import HarmLang.Utility
 
 import Data.List
 import Data.Maybe
@@ -55,22 +56,18 @@ probsToStr (a:b) = (show a) ++ ", " ++ (probsToStr b)
 
 main :: IO ()
 main = do
-  putStrLn "Please enter the path to the database."
+  putStrLn "Please enter the path to the database, or a newline for the default."
   path <- getLine
   cpd <- loadChordProgressionDatabase (if path == "" then "./res/progressions.txt" else path)
-  --putStrLn $ "DB:\n" ++ (show cpd)
-
-  --Has type [(String, [TimedChordProgression])]
-  --let topClasses = (getTopCategories 5) (getByArtist cpd)
   let topClasses = (getTestArtists cpd)
-  putStrLn $ "Top Classes:\n" ++ (summary topClasses)
+  putStrLn $ "Classes 0 through 3 and number of songs for each:\n" ++ (summary topClasses)
   --let hdms = map (\ (name, progs) -> buildHarmonyDistributionModel 2 (map toUntimedProgression progs)) topClasses
 
   --Has type ([(ChordProgression, Int)], [[ChordProgression]])
   let (test, training) = splitTrainingTest 3 (map ((map toUntimedProgression) . snd) topClasses)
   let hdms = makeHdms (map ((map toUntimedProgression) . snd) (getByArtist cpd)) training
   
-  putStrLn $ concat (map (\ (prog, classIndex) -> "Class " ++ (show classIndex) ++ ", " ++ ("rank " ++ (show $ getRank (inferStyle hdms prog) classIndex)) ++ ", " ++ (show $ inferStyle hdms prog) ++ "\n") test )
+  putStrLn $ concat (map (\ (prog, classIndex) -> "Song belonging to class " ++ (show classIndex) ++ "; class " ++ (show classIndex) ++ (" ranked #" ++ (show $ (getRank (inferStyle hdms prog) classIndex) + 1)) ++ " most likely to generate:\n\t" ++ (show $ inferStyle hdms prog) ++ "\n") test )
 
 --TODO robustness testing.
 
