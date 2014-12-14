@@ -1,4 +1,4 @@
-harmlang
+HarmLang
 ========
 By Cyrus Cousins, Louis Rassaby, and Caleb Malchik
 ---
