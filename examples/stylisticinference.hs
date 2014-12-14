@@ -63,7 +63,7 @@ main = do
   putStrLn $ "Classes 0 through 3 and number of songs for each:\n" ++ (summary topClasses)
   --let hdms = map (\ (name, progs) -> buildHarmonyDistributionModel 2 (map toUntimedProgression progs)) topClasses
 
-  --Has type ([(ChordProgression, Int)], [[ChordProgression]])
+  --Has type ([(ChordProgression, Int)], [[ChordProgression]]) -- the Int is the index of the artist that the song belongs to
   let (test, training) = splitTrainingTest 3 (map ((map toUntimedProgression) . snd) topClasses)
   let hdms = makeHdms (map ((map toUntimedProgression) . snd) (getByArtist cpd)) training
   
