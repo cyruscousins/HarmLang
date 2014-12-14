@@ -40,8 +40,16 @@ cdChoose d d1 d2 = \e -> choose d (d1 e) (d2 e)
 
 
 
+applyToConditional :: (Dist dat -> b) -> ConditionalDist ev dat -> (ev -> b)
+applyToConditional f cdist = \e -> f (cdist e)
+
+pmapConditional :: (Eq dat, Eq dat') => (dat -> dat') -> ConditionalDist ev dat -> ConditionalDist ev dat'
+pmapConditional f = applyToConditional (pmap f) 
 
 
+
+
+--Test transformers
 intTrans :: Transformer [Int] [Int] Int Int
 intTrans ev@(h:_) = (map ((-) h) ev, ((-) h), ((+) h))
 
