@@ -38,18 +38,25 @@ library
   other-extensions: DeriveDataTypeable, FlexibleInstances, OverlappingInstances, TypeSynonymInstances, QuasiQuotes
   
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.5 && <4.8,
-                       template-haskell,
-                       HUnit,
-                       parsec >= 3.1.0,
-                       syb,
---                       HCodecs,
-                       -- Euterpea,
-                       containers
+  build-depends: base >=4.5 && <4.8, template-haskell, HUnit, parsec >= 3.1.0, syb, HCodecs, containers
   
   -- Directories containing source files.
   hs-source-dirs:      src/
   
   -- Base language which the package is written in.
   default-language:    Haskell2010
-  
+
+executable arpeggiate
+  hs-source-dirs: examples/ src
+  main-is: arpeggiatesong.hs
+  build-depends: base >=4.5 && <4.8, template-haskell, HUnit, parsec >= 3.1.0, syb, HCodecs, containers
+  --build-depends: harmlang 
+  default-language: Haskell2010
+
+executable blues
+  hs-source-dirs: examples/ src/
+  main-is: bluesmachine.hs
+  build-depends: base >=4.5 && <4.8, template-haskell, HUnit, parsec >= 3.1.0, syb, HCodecs, containers
+  --build-depends: harmlang 
+  default-language: Haskell2010
+
