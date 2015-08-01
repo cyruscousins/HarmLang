@@ -50,13 +50,22 @@ executable arpeggiate
   hs-source-dirs: examples/ src
   main-is: arpeggiatesong.hs
   build-depends: base >=4.5 && <4.8, template-haskell, HUnit, parsec >= 3.1.0, syb, HCodecs, containers
-  --build-depends: harmlang 
   default-language: Haskell2010
 
 executable blues
   hs-source-dirs: examples/ src/
   main-is: bluesmachine.hs
   build-depends: base >=4.5 && <4.8, template-haskell, HUnit, parsec >= 3.1.0, syb, HCodecs, containers
-  --build-depends: harmlang 
   default-language: Haskell2010
 
+executable melody
+  hs-source-dirs: examples/ src/
+  main-is: melody.hs
+  build-depends: base >=4.5 && <4.8, template-haskell, HUnit, parsec >= 3.1.0, syb, HCodecs, containers
+  default-language: Haskell2010
+
+executable inference
+  hs-source-dirs: examples/ src/
+  main-is: stylisticinference.hs
+  build-depends: base >=4.5 && <4.8, template-haskell, HUnit, parsec >= 3.1.0, syb, HCodecs, containers
+  default-language: Haskell2010
