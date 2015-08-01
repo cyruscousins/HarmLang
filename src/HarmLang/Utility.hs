@@ -15,11 +15,11 @@ removeAdjacentDups xs = remove xs
       | x1 == x2  = remove (x1:xs)
       | otherwise = x1 : remove (x2:xs)
 
---Based on http://stackoverflow.com/questions/4978578/how-to-split-a-string-in-haskell
+-- http://stackoverflow.com/questions/4978578/how-to-split-a-string-in-haskell
 separateBy :: Eq a => a -> [a] -> [[a]]
 separateBy chr = unfoldr sep where
   sep [] = Nothing
-  sep l  = Just $ fmap tail . break (== chr) $ l
+  sep l  = Just $ fmap (drop 1) . break (== chr) $ l
 
 -- A Cyrus Cousins original.
 allRotations :: [a] -> [[a]]

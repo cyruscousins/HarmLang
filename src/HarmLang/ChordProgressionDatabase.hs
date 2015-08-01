@@ -38,9 +38,13 @@ sortGroupsBySize = sortBy (compareBy (length . snd))
 
 cpdEntryFromString :: String -> ((Data.Map.Map String String), TimedChordProgression) 
 cpdEntryFromString str = let
+  greatSplits :: [String]
   greatSplits = separateBy ';' str
+  minorSplits :: [[String]]
   minorSplits = map (separateBy ':') greatSplits
+  progression :: TimedChordProgression
   progression = interpretTimedChordProgression $ last greatSplits 
+  allButLastMinorSplit :: [[String]]
   allButLastMinorSplit = (take ((-) (length minorSplits) 1) minorSplits)
   progMap = Data.Map.fromList (map (\ l -> (l !! 0, l !! 1)) allButLastMinorSplit)
   in (progMap, progression)

@@ -1,5 +1,3 @@
-module Examples.StylisticInference where
-
 import HarmLang.Types
 import HarmLang.InitialBasis
 
@@ -58,7 +56,11 @@ main :: IO ()
 main = do
   putStrLn "Please enter the path to the database, or a newline for the default."
   path <- getLine
+  print "got line"
   cpd <- loadChordProgressionDatabase (if path == "" then "./res/progressions.txt" else path)
+  putStr "A"
+  putStr $ "\"" ++ (show cpd) ++ "\""
+  putStr "B"
   let topClasses = (getTestArtists cpd)
   putStrLn $ "Classes 0 through 3 and number of songs for each:\n" ++ (summary topClasses)
   --let hdms = map (\ (name, progs) -> buildHarmonyDistributionModel 2 (map toUntimedProgression progs)) topClasses
