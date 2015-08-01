@@ -6,6 +6,7 @@ import Language.Haskell.TH
 import Data.Tuple
 import Data.Char
 import Data.List
+import Data.Ratio
 
 import qualified Control.Applicative as Ctrl
 
@@ -119,7 +120,7 @@ parseSimpleTime :: GenParser Char st Time
 parseSimpleTime =
   do
     num <- parseUInteger
-    return $ Time num 4
+    return $ Time $ (%) num 4
   
 --Time with denominator included
 parseComplexTime :: GenParser Char st Time
@@ -128,7 +129,7 @@ parseComplexTime =
     num <- parseUInteger
     _ <- (char '/')
     den <- parseUInteger
-    return $ Time num den
+    return $ Time $ (%) num den
 
 --Time with or without deominator
 parseTime :: GenParser Char st Time

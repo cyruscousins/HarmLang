@@ -1,6 +1,4 @@
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE OverlappingInstances #-}
-{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances, OverlappingInstances, TypeSynonymInstances #-}
 
 module HarmLang.InitialBasis where
 
@@ -176,20 +174,28 @@ instance Transposable a => Transposable [a] where
 
 -- Many types have some sense of time
 
+timeSub :: Time -> Time -> Time
+timeSub (Time a) (Time b) = Time $ (-) a b
+
 class Timed a where
   askTime :: a -> Time
   reTime :: a -> Time -> a
+  asRational :: a -> Rational
+  asRational =
+    let toRat (Time rat) = rat
+     in asRational . askTime
 
 -- The Time type is trivially timed.
-
 instance Timed Time where
   askTime time = time
   reTime time newTime = newTime
 
+--Notes have a time component
 instance Timed Note where
   askTime (Note pitch time) = time
   reTime (Note pitch time) newTime = Note pitch newTime
 
+--Timed chords have a timed component
 instance Timed TimedChord where
   askTime (TimedChord chord time) = time
   reTime (TimedChord chord time) newTime = TimedChord chord newTime
@@ -198,20 +204,14 @@ instance Timed TimedChord where
 
 -- TODO time stretch function?  Need a way to do this and keep reduced fractions.
 
---Better way to do this?
-timeTop (Time a b) = a 
-
 --Take the requested length of time worth of the given list.
---TODO implement this well (only works for things in quarter notes now).
 takeByTime :: Timed a => [a] -> Time -> [a]
-takeByTime (item:list) (Time num den) = if (>) num 0 then [item] else item : (takeByTime list (Time ((-) num (timeTop . askTime $ item)) den))
+takeByTime (item:list) otime = 
+  let timeLeft = (timeSub) otime (askTime item)
+   in if timeLeft == (Time 0) then [item]
+      else if timeLeft > (Time 0) then (:) item (takeByTime list timeLeft)
+      else [(reTime item otime)]
 takeByTime _ _ = []
-
---TODO cleaner syntax?
---timeSubtract :: Time -> Time 
-
---TODO
---timeMultiplier a Timed :: -> Time -> a
 
 --Add timing information to a progression
 toTimedProgression :: Time -> ChordProgression -> TimedChordProgression
@@ -272,17 +272,14 @@ isInversion c1 c2 = elem c2 (chordInversions c1)
 
 
 
-
-
-
 arpeggiate :: TimedChordProgression -> NoteProgression
 arpeggiate [] = []
-arpeggiate ((TimedChord (Harmony root intervals) (Time n d)):rest) = let 
-    rootnote = Note (Pitch root (Octave 3)) (Time 1 d)
+arpeggiate ((TimedChord (Harmony root intervals) (Time t)):rest) =
+  let
+    n = floor $ (*) t 8 -- Number of eighth notes
+    rootnote = Note (Pitch root (Octave 3)) (Time (1 / 8))
     others = map (\i -> transpose rootnote i) intervals
     notes = take n (cycle $ rootnote:others)
     in
     notes ++ arpeggiate rest
-
-
 

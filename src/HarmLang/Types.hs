@@ -1,13 +1,11 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE OverlappingInstances #-}
-{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE DeriveDataTypeable, FlexibleInstances, OverlappingInstances, TypeSynonymInstances #-}
 
 module HarmLang.Types where
 
 import Data.Typeable
 import Data.Data
 import Data.List
+import Data.Ratio
 
 -- An absolute class of pitches (element of Z12).
 data PitchClass = PitchClass Int
@@ -15,7 +13,6 @@ data PitchClass = PitchClass Int
 
 instance Eq PitchClass where
   (==) (PitchClass a) (PitchClass b) = (Prelude.==) (mod a 12) (mod b 12)
-  -- (<=) (PitchClass a) (PitchClass b) = (Prelude.<=) (mod a 12) (mod b 12)
 
 instance Enum PitchClass where
   toEnum intval = PitchClass $ mod intval 12
@@ -63,21 +60,15 @@ instance Ord Pitch where
 instance Show Pitch where
   show (Pitch pc oct) = (show pc) ++ "@" ++ (show oct)
 
--- Time is expressed as a fraction of a whole note.  The fraction is expected to be reduced.
-data Time = Time Int Int 
+-- Time is expressed as a fraction of a whole note.
+data Time = Time (Ratio Int)
   deriving (Eq, Data, Typeable)
 
 instance Show Time where
-  show (Time top bottom) = (show top) ++ "/" ++ (show bottom)
-
---instance Eq Time where
---  (==) (Time n1 d1) (Time n2 d2) = (Prelude.==) ((/) (toRational n1) (toRational d1)) ((/) (toRational n2) (toRational d2))
+  show (Time rat) = (show (numerator rat)) ++ "/" ++ (show (denominator rat))
 
 instance Ord Time where
-  (<=) (Time n1 d1) (Time n2 d2) = 
-    (Prelude.<=) 
-    ((/) (toRational n1) (toRational d1)) 
-    ((/) (toRational n2) (toRational d2))
+  (<=) (Time t0) (Time t1) = (Prelude.<=) t0 t1
 
 data Note = Note Pitch Time deriving (Eq, Data, Typeable) --TODO At some point we want to add the option for a rest in here as well.
 
